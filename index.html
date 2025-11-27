@@ -394,67 +394,43 @@
 
       // ======= SISTEM KODE UNIK =======
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const modal = document.getElementById('kodeModal');
+    const input = document.getElementById('kodeInput');
+    const submit = document.getElementById('kodeSubmit');
+    const msg = document.getElementById('kodeMsg');
 
-    // ==========================
-    // KONFIGURASI
-    // ==========================
-    const URL_KODE = "https://test-5z0.pages.dev/kode.js";   // GANTI URL INI
     const STORAGE_KEY = "sandbox_aktif";
-    let daftarKode = [];
-
-    // ==========================
-    // AMBIL DAFTAR KODE DARI URL
-    // ==========================
-    fetch(URL_KODE)
-        .then(res => res.json())
-        .then(data => {
-            daftarKode = data.kode || [];
-            console.log("Daftar kode dimuat:", daftarKode);
-        })
-        .catch(err => console.error("Gagal memuat kode eksternal", err));
-
-    // ==========================
-    // ELEMEN
-    // ==========================
-    const modal = document.getElementById("kodeModal");
-    const input = document.getElementById("kodeInput");
-    const submit = document.getElementById("kodeSubmit");
-    const skip = document.getElementById("kodeSkip");
-    const msg = document.getElementById("kodeMsg");
-
-    // ==========================
-    // CEK LOCALSTORAGE (pernah benar)
-    // ==========================
+    
+    // jika sudah benar sebelumnya, langsung skip modal
     if (localStorage.getItem(STORAGE_KEY) === "1") {
-        applySandbox();
         modal.style.display = "none";
+        return;
     }
 
-    // ==========================
-    // EVENT LISTENER
-    // ==========================
-    submit.addEventListener("click", verifikasiKode);
-    input.addEventListener("keydown", e => { 
-        if (e.key === "Enter") verifikasiKode(); 
-    });
+    // ambil daftar kode hash dari JSON eksternal
+    let daftarKode = [];
+    try {
+        const res = await fetch('https://example.com/kode.json');
+        const data = await res.json();
+        daftarKode = data.kode || [];
+        console.log("Daftar hash kode dimuat:", daftarKode);
+    } catch (e) {
+        console.error("Gagal memuat kode JSON", e);
+        msg.style.display = 'block';
+        msg.textContent = 'Error memuat kode.';
+    }
 
-    skip.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
-
-    // ==========================
-    // FUNKSI VERIFIKASI KODE
-    // ==========================
+    // fungsi verifikasi
     function verifikasiKode() {
         const val = input.value.trim();
-
         if (!val) {
-            tampilkanPesan("Masukkan kode terlebih dahulu!", true);
+            msg.style.display = 'block';
+            msg.textContent = 'Masukkan kode terlebih dahulu.';
             return;
         }
 
-         // hash input user
+        // hash input user
         const hashInput = CryptoJS.MD5(val).toString();  // gunakan MD5 atau SHA256 sesuai JSON
         if (daftarKode.includes(hashInput)) {
             msg.style.display = 'block';
@@ -462,6 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
             msg.textContent = 'Kode benar — sandbox aktif!';
             localStorage.setItem(STORAGE_KEY, '1');
 
+         
             setTimeout(() => {
                 modal.style.display = "none";
             }, 700);
