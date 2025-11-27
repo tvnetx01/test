@@ -394,65 +394,82 @@
 
       // ======= SISTEM KODE UNIK =======
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const modal = document.getElementById('kodeModal');
-    const input = document.getElementById('kodeInput');
-    const submit = document.getElementById('kodeSubmit');
-    const msg = document.getElementById('kodeMsg');
+document.addEventListener("DOMContentLoaded", () => {
 
+    // ==========================
+    // KONFIGURASI
+    // ==========================
+    const URL_KODE = "https://test-5z0.pages.dev/kode.js";   // GANTI URL INI
     const STORAGE_KEY = "sandbox_aktif";
-    
-    // jika sudah benar sebelumnya, langsung skip modal
-    if (localStorage.getItem(STORAGE_KEY) === "1") {
-        modal.style.display = "none";
-        return;
-    }
-
-    // ambil daftar kode hash dari JSON eksternal
     let daftarKode = [];
-    try {
-        const res = await fetch('https://test-5z0.pages.dev/kode.json');
-        const data = await res.json();
-        daftarKode = data.kode || [];
-        console.log("Daftar hash kode dimuat:", daftarKode);
-    } catch (e) {
-        console.error("Gagal memuat kode JSON", e);
-        msg.style.display = 'block';
-        msg.textContent = 'Error memuat kode.';
+
+    // ==========================
+    // AMBIL DAFTAR KODE DARI URL
+    // ==========================
+    fetch(URL_KODE)
+        .then(res => res.json())
+        .then(data => {
+            daftarKode = data.kode || [];
+            console.log("Daftar kode dimuat:", daftarKode);
+        })
+        .catch(err => console.error("Gagal memuat kode eksternal", err));
+
+    // ==========================
+    // ELEMEN
+    // ==========================
+    const modal = document.getElementById("kodeModal");
+    const input = document.getElementById("kodeInput");
+    const submit = document.getElementById("kodeSubmit");
+    const skip = document.getElementById("kodeSkip");
+    const msg = document.getElementById("kodeMsg");
+
+    // ==========================
+    // CEK LOCALSTORAGE (pernah benar)
+    // ==========================
+    if (localStorage.getItem(STORAGE_KEY) === "1") {
+        applySandbox();
+        modal.style.display = "none";
     }
 
-    // fungsi verifikasi
+    // ==========================
+    // EVENT LISTENER
+    // ==========================
+    submit.addEventListener("click", verifikasiKode);
+    input.addEventListener("keydown", e => { 
+        if (e.key === "Enter") verifikasiKode(); 
+    });
+
+    skip.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // ==========================
+    // FUNKSI VERIFIKASI KODE
+    // ==========================
     function verifikasiKode() {
         const val = input.value.trim();
+
         if (!val) {
-            msg.style.display = 'block';
-            msg.textContent = 'Masukkan kode terlebih dahulu.';
+            tampilkanPesan("Masukkan kode terlebih dahulu!", true);
             return;
         }
 
-        // hash input user
-        const hashInput = CryptoJS.MD5(val).toString();  // gunakan MD5 atau SHA256 sesuai JSON
-        if (daftarKode.includes(hashInput)) {
-            msg.style.display = 'block';
-            msg.style.color = '#b3ffb3';
-            msg.textContent = 'Kode benar — sandbox aktif!';
-            localStorage.setItem(STORAGE_KEY, '1');
+        if (daftarKode.includes(val)) {
+            tampilkanPesan("Kode benar! Sandbox aktif.", false);
 
-         
-            // tutup modal
-            setTimeout(() => modal.style.display = 'none', 700);
+            applySandbox();
+            localStorage.setItem(STORAGE_KEY, "1");
+
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 700);
+
         } else {
-            msg.style.display = 'block';
-            msg.style.color = '#ffb3b3';
-            msg.textContent = 'Kode salah!';
-            input.style.animation = 'shake 0.3s';
-            setTimeout(()=> input.style.animation='', 350);
+            tampilkanPesan("Kode salah! Silakan coba lagi.", true);
+            input.style.animation = "shake 0.3s";
+            setTimeout(() => input.style.animation = "", 350);
         }
     }
-
-    submit.addEventListener('click', verifikasiKode);
-    input.addEventListener('keydown', e => { if(e.key === 'Enter') verifikasiKode(); });
-});
 
     // ==========================
     // FUNKSI TAMPILKAN PESAN
