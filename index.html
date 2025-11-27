@@ -399,7 +399,7 @@
            <div class="sandbox-indicator" id="sandboxIndicator">
                🛡️ SANDBOX MODE AKTIF
            </div>
-           <!-- Iframe tanpa sandbox awal -->
+           <!-- Iframe akan diganti ketika sandbox diaktifkan -->
            <iframe class="player-frame" id="wcq" title="Pemutar Video" frameborder="0" 
                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                    allowfullscreen></iframe>
@@ -415,7 +415,7 @@
    <div class="modal" id="codeModal">
        <div class="modal-content" id="modalContent">
            <h2>🔐 AKTIFKAN SANDBOX MODE</h2>
-           <p>Masukkan kode: <strong style="color: gold;">123456</strong></p>
+           <p>Masukkan kode: <strong style="color: gold; font-size: 24px;">123456</strong></p>
            <input type="text" class="code-input" id="codeInput" placeholder="123456" maxlength="6" autocomplete="off">
            <button class="submit-btn" id="submitCode">
                🚀 AKTIFKAN SANDBOX
@@ -427,7 +427,7 @@
                Status: <span id="sandboxStatus" style="color: #ff4444;">SANDBOX TIDAK AKTIF</span>
            </div>
            <div class="debug-info" id="debugInfo">
-               Kode: 123456
+               Kode: 123456 | Klik tombol 🔐 untuk membuka
            </div>
            <button class="close-modal" id="closeModal">Tutup</button>
        </div>
@@ -454,29 +454,8 @@
    </div>
 
    <script>
-       // Debug awal
-       console.log('Script dimuat');
-
-       // Fungsi untuk mengambil parameter dari URL
-       function getParameterByName(name) {
-           const url = window.location.href;
-           name = name.replace(/[\[\]]/g, '\\$&');
-           const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-               results = regex.exec(url);
-           if (!results) return null;
-           if (!results[2]) return '';
-           return decodeURIComponent(results[2].replace(/\+/g, ' '));
-       }
-
-       // Mendapatkan id dari parameter URL
-       const idBaru = getParameterByName('id');
-       if (idBaru) {
-           const iframe = document.getElementById('wcq');
-           iframe.id = idBaru;
-       }
-
-       // Variabel global
-       let sandboxActive = false;
+       // Simpan URL asli iframe
+       let originalIframeSrc = '';
 
        // Inisialisasi elemen
        const codeModal = document.getElementById('codeModal');
@@ -484,14 +463,14 @@
        const codeInput = document.getElementById('codeInput');
        const submitCode = document.getElementById('submitCode');
        const closeModal = document.getElementById('closeModal');
-       const playerFrame = document.getElementById('wcq');
+       const playerContainer = document.querySelector('.player-container');
        const sandboxIndicator = document.getElementById('sandboxIndicator');
        const successMessage = document.getElementById('successMessage');
        const sandboxStatus = document.getElementById('sandboxStatus');
        const debugInfo = document.getElementById('debugInfo');
        const notification = document.getElementById('notification');
 
-       // Fungsi sederhana untuk menampilkan notifikasi
+       // Fungsi untuk menampilkan notifikasi
        function showNotification(message, isSuccess) {
            notification.textContent = message;
            notification.style.borderColor = isSuccess ? '#00ff00' : '#ff4444';
@@ -503,25 +482,45 @@
            }, 3000);
        }
 
-       // Fungsi untuk mengaktifkan sandbox - CARA SEDERHANA
-       function activateSandbox() {
-           console.log('Mengaktifkan sandbox...');
+       // Fungsi untuk membuat iframe dengan sandbox
+       function createSandboxIframe() {
+           console.log('Membuat iframe dengan sandbox...');
            
-           // Cara 1: Langsung set atribut sandbox
-           playerFrame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+           // Dapatkan iframe saat ini
+           const currentIframe = document.getElementById('wcq');
            
-           // Cara 2: Juga set via property
-           playerFrame.sandbox = 'allow-scripts allow-same-origin';
+           // Simpan src jika belum disimpan
+           if (!originalIframeSrc && currentIframe.src) {
+               originalIframeSrc = currentIframe.src;
+           }
            
-           sandboxActive = true;
-           console.log('Sandbox diaktifkan:', playerFrame.getAttribute('sandbox'));
+           // Hapus iframe lama
+           currentIframe.remove();
            
-           // Tampilkan indikator
-           sandboxIndicator.style.display = 'block';
-           sandboxStatus.textContent = 'SANDBOX AKTIF';
-           sandboxStatus.style.color = '#00ff00';
+           // Buat iframe baru dengan sandbox
+           const newIframe = document.createElement('iframe');
+           newIframe.className = 'player-frame';
+           newIframe.id = 'wcq';
+           newIframe.title = 'Pemutar Video';
+           newIframe.frameborder = '0';
            
-           return true;
+           // TAMBAH SANDBOX DI SINI - ini yang utama
+           newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+           
+           // Set atribut allow yang diperlukan
+           newIframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+           newIframe.allowFullscreen = true;
+           
+           // Set source
+           if (originalIframeSrc) {
+               newIframe.src = originalIframeSrc;
+           }
+           
+           // Tambahkan ke container
+           playerContainer.appendChild(newIframe);
+           
+           console.log('Iframe baru dibuat dengan sandbox:', newIframe.getAttribute('sandbox'));
+           return newIframe;
        }
 
        // Buka modal
@@ -529,6 +528,7 @@
            console.log('Membuka modal sandbox');
            codeModal.style.display = 'flex';
            codeInput.focus();
+           codeInput.value = ''; // Reset input
        });
 
        // Tutup modal
@@ -546,33 +546,53 @@
            }
        });
 
-       // Handle submit kode - VERSI SEDERHANA
+       // Handle submit kode
        submitCode.addEventListener('click', function() {
            const enteredCode = codeInput.value.trim();
            console.log('Kode dimasukkan:', enteredCode);
            
            if (enteredCode === '123456') {
-               console.log('Kode benar!');
+               console.log('Kode benar! Mengaktifkan sandbox...');
                
-               // Aktifkan sandbox
-               const success = activateSandbox();
-               
-               if (success) {
-                   // Tampilkan pesan sukses
-                   successMessage.style.display = 'block';
-                   submitCode.textContent = '✅ BERHASIL';
-                   submitCode.classList.add('success');
+               try {
+                   // Buat iframe baru dengan sandbox
+                   const newIframe = createSandboxIframe();
                    
-                   // Tampilkan notifikasi
-                   showNotification('🎉 Sandbox berhasil diaktifkan!', true);
+                   // Periksa apakah sandbox berhasil diterapkan
+                   const sandboxValue = newIframe.getAttribute('sandbox');
+                   console.log('Nilai sandbox:', sandboxValue);
                    
-                   // Nonaktifkan input
-                   codeInput.disabled = true;
+                   if (sandboxValue && sandboxValue.includes('allow-scripts')) {
+                       // BERHASIL - tampilkan indikator
+                       sandboxIndicator.style.display = 'block';
+                       sandboxStatus.textContent = 'SANDBOX AKTIF';
+                       sandboxStatus.style.color = '#00ff00';
+                       
+                       // Tampilkan pesan sukses
+                       successMessage.style.display = 'block';
+                       submitCode.textContent = '✅ BERHASIL';
+                       submitCode.classList.add('success');
+                       
+                       // Tampilkan notifikasi
+                       showNotification('🎉 Sandbox berhasil diaktifkan! Iframe sekarang aman', true);
+                       
+                       // Nonaktifkan input
+                       codeInput.disabled = true;
+                       
+                       // Update debug info
+                       debugInfo.textContent = 'SANDBOX AKTIF: ' + sandboxValue;
+                       
+                       // Tutup modal setelah 2 detik
+                       setTimeout(() => {
+                           codeModal.style.display = 'none';
+                       }, 2000);
+                   } else {
+                       throw new Error('Sandbox tidak berhasil diterapkan');
+                   }
                    
-                   // Tutup modal setelah 2 detik
-                   setTimeout(() => {
-                       codeModal.style.display = 'none';
-                   }, 2000);
+               } catch (error) {
+                   console.error('Error:', error);
+                   showNotification('❌ Gagal mengaktifkan sandbox', false);
                }
                
            } else {
@@ -590,7 +610,7 @@
            }
        });
 
-       // Fungsi chat toggle (dari kode asli)
+       // Fungsi chat toggle
        const chatToggle = document.getElementById('chatToggle');
        const chatContainer = document.getElementById('chatContainer');
        let chatVisible = false;
@@ -606,7 +626,7 @@
            }
        });
 
-       // Handle orientasi (dari kode asli)
+       // Handle orientasi
        function handleOrientation() {
            if (window.innerWidth >= 768) {
                if (!chatContainer.classList.contains('active')) {
@@ -619,7 +639,7 @@
        window.addEventListener('load', handleOrientation);
        window.addEventListener('resize', handleOrientation);
 
-       // Tombol popup (dari kode asli)
+       // Tombol popup
        const tombol = document.getElementById('tombol');
        tombol.addEventListener('click', function(e) {
            e.preventDefault();
@@ -630,8 +650,22 @@
            }, 1000);
        });
 
-       // Debug info
-       debugInfo.textContent = 'Kode: 123456 | Klik tombol 🔐';
+       // Ambil parameter ID dari URL
+       function getParameterByName(name) {
+           const url = window.location.href;
+           name = name.replace(/[\[\]]/g, '\\$&');
+           const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+               results = regex.exec(url);
+           if (!results) return null;
+           if (!results[2]) return '';
+           return decodeURIComponent(results[2].replace(/\+/g, ' '));
+       }
+
+       const idBaru = getParameterByName('id');
+       if (idBaru) {
+           const iframe = document.getElementById('wcq');
+           iframe.id = idBaru;
+       }
 
        console.log('Aplikasi siap. Kode sandbox: 123456');
    </script>
