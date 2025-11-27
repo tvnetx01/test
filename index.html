@@ -53,13 +53,6 @@
            display: none;
            border: 2px solid #00ff00;
            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
-           animation: glow 2s infinite;
-       }
-
-       @keyframes glow {
-           0% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
-           50% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.9); }
-           100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
        }
 
        .chat-container {
@@ -177,7 +170,6 @@
            margin-bottom: 20px;
            color: gold;
            font-size: 28px;
-           text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
        }
 
        .modal p {
@@ -233,7 +225,6 @@
            background: linear-gradient(45deg, #006400, #008000);
            border-color: #00ff00;
            color: white;
-           box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
        }
 
        .close-modal {
@@ -276,26 +267,6 @@
            transform: scale(1.05);
        }
 
-       .success-animation {
-           animation: successPulse 2s ease-in-out;
-       }
-
-       @keyframes successPulse {
-           0% { 
-               transform: scale(1); 
-               box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-           }
-           50% { 
-               transform: scale(1.03); 
-               box-shadow: 0 0 50px rgba(0, 255, 0, 0.9);
-               border-color: #00ff00;
-           }
-           100% { 
-               transform: scale(1); 
-               box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-           }
-       }
-
        .success-message {
            color: #00ff00;
            font-weight: bold;
@@ -306,12 +277,6 @@
            border-radius: 10px;
            border: 2px solid #00ff00;
            display: none;
-           animation: textGlow 1.5s infinite;
-       }
-
-       @keyframes textGlow {
-           0%, 100% { text-shadow: 0 0 10px rgba(0, 255, 0, 0.7); }
-           50% { text-shadow: 0 0 20px rgba(0, 255, 0, 1); }
        }
 
        .status-check {
@@ -321,10 +286,6 @@
            border-radius: 8px;
            font-size: 14px;
            border: 1px solid #444;
-       }
-
-       .status-check span {
-           font-weight: bold;
        }
 
        .debug-info {
@@ -436,7 +397,7 @@
    <div class="container">
        <div class="player-container">
            <div class="sandbox-indicator" id="sandboxIndicator">
-               🛡️ SANDBOX MODE AKTIF - AMAN
+               🛡️ SANDBOX MODE AKTIF
            </div>
            <!-- Iframe tanpa sandbox awal -->
            <iframe class="player-frame" id="wcq" title="Pemutar Video" frameborder="0" 
@@ -454,20 +415,19 @@
    <div class="modal" id="codeModal">
        <div class="modal-content" id="modalContent">
            <h2>🔐 AKTIFKAN SANDBOX MODE</h2>
-           <p>Masukkan kode unik <strong>123456</strong> untuk mengaktifkan fitur keamanan sandbox</p>
-           <input type="text" class="code-input" id="codeInput" placeholder="Masukkan kode" maxlength="6" autocomplete="off">
+           <p>Masukkan kode: <strong style="color: gold;">123456</strong></p>
+           <input type="text" class="code-input" id="codeInput" placeholder="123456" maxlength="6" autocomplete="off">
            <button class="submit-btn" id="submitCode">
                🚀 AKTIFKAN SANDBOX
            </button>
            <div class="success-message" id="successMessage">
-               ✅ SANDBOX BERHASIL DIAKTIFKAN!<br>
-               Iframe sekarang dalam mode aman dengan sandbox
+               ✅ BERHASIL! Sandbox telah diaktifkan
            </div>
            <div class="status-check" id="statusCheck">
-               Status Sandbox: <span id="sandboxStatus" style="color: #ff4444;">TIDAK AKTIF</span>
+               Status: <span id="sandboxStatus" style="color: #ff4444;">SANDBOX TIDAK AKTIF</span>
            </div>
            <div class="debug-info" id="debugInfo">
-               Debug: Menunggu kode...
+               Kode: 123456
            </div>
            <button class="close-modal" id="closeModal">Tutup</button>
        </div>
@@ -494,7 +454,10 @@
    </div>
 
    <script>
-        // Fungsi untuk mengambil parameter dari URL
+       // Debug awal
+       console.log('Script dimuat');
+
+       // Fungsi untuk mengambil parameter dari URL
        function getParameterByName(name) {
            const url = window.location.href;
            name = name.replace(/[\[\]]/g, '\\$&');
@@ -512,62 +475,10 @@
            iframe.id = idBaru;
        }
 
-       // Mengubah teks tombol setelah diklik
-       const tombol = document.getElementById('tombol');
-       tombol.addEventListener('click', function(e) {
-           e.preventDefault();
-           this.style.opacity = '1.9';
-           this.innerHTML = 'Karna Anda Dialihkan Oleh Iklan';
-           
-           setTimeout(() => {
-               window.location.href = this.href;
-           }, 1000);
-       });
+       // Variabel global
+       let sandboxActive = false;
 
-       // Sembunyikan notifikasi setelah beberapa detik
-       setTimeout(() => {
-           notification.style.display = 'none';
-       }, 5000);
-
-       // Fungsi untuk toggle chat container
-       const chatToggle = document.getElementById('chatToggle');
-       const chatContainer = document.getElementById('chatContainer');
-       let chatVisible = false;
-
-       chatToggle.addEventListener('click', function() {
-           chatVisible = !chatVisible;
-           
-           if (chatVisible) {
-               chatContainer.classList.add('active');
-               if (window.innerWidth >= 768) {
-                   this.innerHTML = '❌ Close Chat';
-               } else {
-                   this.textContent = '❌ Close Chat';
-               }
-           } else {
-               chatContainer.classList.remove('active');
-               if (window.innerWidth >= 768) {
-                   this.innerHTML = '💬 Chat';
-               } else {
-                   this.textContent = '💬 Chat';
-               }
-           }
-       });
-
-       // Deteksi orientasi layar
-       function handleOrientation() {
-           if (window.innerWidth >= 768) {
-               if (!chatContainer.classList.contains('active')) {
-                   chatContainer.classList.add('active');
-                   chatVisible = true;
-               }
-           }
-       }
-
-       window.addEventListener('load', handleOrientation);
-       window.addEventListener('resize', handleOrientation);
-
-       // KODE UTAMA UNTUK SANDBOX
+       // Inisialisasi elemen
        const codeModal = document.getElementById('codeModal');
        const codeToggle = document.getElementById('codeToggle');
        const codeInput = document.getElementById('codeInput');
@@ -576,66 +487,48 @@
        const playerFrame = document.getElementById('wcq');
        const sandboxIndicator = document.getElementById('sandboxIndicator');
        const successMessage = document.getElementById('successMessage');
-       const modalContent = document.getElementById('modalContent');
        const sandboxStatus = document.getElementById('sandboxStatus');
-       const statusCheck = document.getElementById('statusCheck');
        const debugInfo = document.getElementById('debugInfo');
        const notification = document.getElementById('notification');
 
-       // Kode unik yang valid
-       const validCode = "123456";
+       // Fungsi sederhana untuk menampilkan notifikasi
+       function showNotification(message, isSuccess) {
+           notification.textContent = message;
+           notification.style.borderColor = isSuccess ? '#00ff00' : '#ff4444';
+           notification.style.background = isSuccess ? 'rgba(0, 128, 0, 0.95)' : 'rgba(128, 0, 0, 0.95)';
+           notification.style.display = 'block';
+           
+           setTimeout(() => {
+               notification.style.display = 'none';
+           }, 3000);
+       }
 
-       // Fungsi untuk mengaktifkan sandbox dengan cara yang benar
+       // Fungsi untuk mengaktifkan sandbox - CARA SEDERHANA
        function activateSandbox() {
            console.log('Mengaktifkan sandbox...');
            
-           // Simpan src iframe terlebih dahulu
-           const currentSrc = playerFrame.src;
+           // Cara 1: Langsung set atribut sandbox
+           playerFrame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
            
-           // Buat iframe baru dengan sandbox
-           const newIframe = document.createElement('iframe');
-           newIframe.className = 'player-frame';
-           newIframe.id = playerFrame.id;
-           newIframe.title = 'Pemutar Video';
-           newIframe.frameborder = '0';
-           newIframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-           newIframe.allowFullscreen = true;
+           // Cara 2: Juga set via property
+           playerFrame.sandbox = 'allow-scripts allow-same-origin';
            
-           // TAMBAHKAN SANDBOX DI SINI
-           newIframe.sandbox = 'allow-scripts allow-same-origin allow-popups allow-forms';
+           sandboxActive = true;
+           console.log('Sandbox diaktifkan:', playerFrame.getAttribute('sandbox'));
            
-           // Setel src setelah sandbox
-           newIframe.src = currentSrc;
+           // Tampilkan indikator
+           sandboxIndicator.style.display = 'block';
+           sandboxStatus.textContent = 'SANDBOX AKTIF';
+           sandboxStatus.style.color = '#00ff00';
            
-           // Ganti iframe lama dengan yang baru
-           playerFrame.parentNode.replaceChild(newIframe, playerFrame);
-           
-           console.log('Sandbox berhasil diterapkan:', newIframe.sandbox);
-           return newIframe;
+           return true;
        }
 
-       // Update status sandbox
-       function updateSandboxStatus() {
-           const currentIframe = document.getElementById('wcq');
-           const hasSandbox = currentIframe.hasAttribute('sandbox');
-           const sandboxValue = currentIframe.getAttribute('sandbox');
-           
-           if (hasSandbox && sandboxValue) {
-               sandboxStatus.textContent = 'AKTIF';
-               sandboxStatus.style.color = '#00ff00';
-               debugInfo.textContent = `Debug: Sandbox = "${sandboxValue}"`;
-           } else {
-               sandboxStatus.textContent = 'TIDAK AKTIF';
-               sandboxStatus.style.color = '#ff4444';
-               debugInfo.textContent = 'Debug: Sandbox tidak aktif';
-           }
-       }
-
-       // Buka modal saat tombol kode diklik
+       // Buka modal
        codeToggle.addEventListener('click', function() {
+           console.log('Membuka modal sandbox');
            codeModal.style.display = 'flex';
            codeInput.focus();
-           updateSandboxStatus();
        });
 
        // Tutup modal
@@ -653,77 +546,42 @@
            }
        });
 
-       // Validasi kode
+       // Handle submit kode - VERSI SEDERHANA
        submitCode.addEventListener('click', function() {
            const enteredCode = codeInput.value.trim();
-           debugInfo.textContent = `Debug: Memeriksa kode "${enteredCode}"`;
+           console.log('Kode dimasukkan:', enteredCode);
            
-           if (enteredCode === validCode) {
-               debugInfo.textContent = 'Debug: Kode benar, mengaktifkan sandbox...';
+           if (enteredCode === '123456') {
+               console.log('Kode benar!');
                
                // Aktifkan sandbox
-               const newIframe = activateSandbox();
+               const success = activateSandbox();
                
-               // Tampilkan indikator
-               sandboxIndicator.style.display = 'block';
-               
-               // Tampilkan pesan sukses
-               successMessage.style.display = 'block';
-               modalContent.classList.add('success-animation');
-               
-               // Update status
-               updateSandboxStatus();
-               
-               // Ubah tombol
-               submitCode.textContent = '✅ SANDBOX AKTIF';
-               submitCode.classList.add('success');
-               
-               // Tampilkan notifikasi
-               showNotification('🎉 SANDBOX BERHASIL DIAKTIFKAN! Keamanan iframe ditingkatkan', 'success');
-               
-               // Nonaktifkan input
-               codeInput.disabled = true;
-               
-               // Tutup modal setelah 3 detik
-               setTimeout(() => {
-                   codeModal.style.display = 'none';
-                   codeInput.value = '';
-                   successMessage.style.display = 'none';
-                   modalContent.classList.remove('success-animation');
-               }, 3000);
+               if (success) {
+                   // Tampilkan pesan sukses
+                   successMessage.style.display = 'block';
+                   submitCode.textContent = '✅ BERHASIL';
+                   submitCode.classList.add('success');
+                   
+                   // Tampilkan notifikasi
+                   showNotification('🎉 Sandbox berhasil diaktifkan!', true);
+                   
+                   // Nonaktifkan input
+                   codeInput.disabled = true;
+                   
+                   // Tutup modal setelah 2 detik
+                   setTimeout(() => {
+                       codeModal.style.display = 'none';
+                   }, 2000);
+               }
                
            } else {
-               showNotification('❌ KODE SALAH! Gunakan: 123456', 'error');
-               codeInput.style.borderColor = 'red';
-               codeInput.style.animation = 'shake 0.5s';
+               console.log('Kode salah');
+               showNotification('❌ Kode salah! Gunakan: 123456', false);
                codeInput.value = '';
                codeInput.focus();
-               
-               setTimeout(() => {
-                   codeInput.style.animation = '';
-                   codeInput.style.borderColor = '#444';
-               }, 500);
            }
        });
-
-       // Fungsi notifikasi
-       function showNotification(message, type) {
-           notification.textContent = message;
-           
-           if (type === 'success') {
-               notification.style.borderColor = '#00ff00';
-               notification.style.background = 'rgba(0, 128, 0, 0.95)';
-           } else if (type === 'error') {
-               notification.style.borderColor = '#ff4444';
-               notification.style.background = 'rgba(128, 0, 0, 0.95)';
-           }
-           
-           notification.style.display = 'block';
-           
-           setTimeout(() => {
-               notification.style.display = 'none';
-           }, 4000);
-       }
 
        // Submit dengan Enter
        codeInput.addEventListener('keypress', function(e) {
@@ -732,19 +590,50 @@
            }
        });
 
-       // Animasi shake
-       const style = document.createElement('style');
-       style.textContent = `
-           @keyframes shake {
-               0%, 100% { transform: translateX(0); }
-               25% { transform: translateX(-10px); }
-               75% { transform: translateX(10px); }
-           }
-       `;
-       document.head.appendChild(style);
+       // Fungsi chat toggle (dari kode asli)
+       const chatToggle = document.getElementById('chatToggle');
+       const chatContainer = document.getElementById('chatContainer');
+       let chatVisible = false;
 
-       // Inisialisasi
-       updateSandboxStatus();
+       chatToggle.addEventListener('click', function() {
+           chatVisible = !chatVisible;
+           if (chatVisible) {
+               chatContainer.classList.add('active');
+               this.textContent = '❌ Close Chat';
+           } else {
+               chatContainer.classList.remove('active');
+               this.textContent = '💬 Chat';
+           }
+       });
+
+       // Handle orientasi (dari kode asli)
+       function handleOrientation() {
+           if (window.innerWidth >= 768) {
+               if (!chatContainer.classList.contains('active')) {
+                   chatContainer.classList.add('active');
+                   chatVisible = true;
+               }
+           }
+       }
+
+       window.addEventListener('load', handleOrientation);
+       window.addEventListener('resize', handleOrientation);
+
+       // Tombol popup (dari kode asli)
+       const tombol = document.getElementById('tombol');
+       tombol.addEventListener('click', function(e) {
+           e.preventDefault();
+           this.style.opacity = '1.9';
+           this.innerHTML = 'Karna Anda Dialihkan Oleh Iklan';
+           setTimeout(() => {
+               window.location.href = this.href;
+           }, 1000);
+       });
+
+       // Debug info
+       debugInfo.textContent = 'Kode: 123456 | Klik tombol 🔐';
+
+       console.log('Aplikasi siap. Kode sandbox: 123456');
    </script>
     <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
   
