@@ -39,6 +39,19 @@
           border: none;
       }
    
+       .sandbox-indicator {
+           position: absolute;
+           top: 10px;
+           left: 10px;
+           background: rgba(0, 128, 0, 0.8);
+           color: white;
+           padding: 5px 10px;
+           border-radius: 5px;
+           font-size: 12px;
+           z-index: 10;
+           display: none;
+           border: 1px solid #00ff00;
+       }
 
        .chat-container {
            height: 0;
@@ -129,7 +142,7 @@
            left: 0;
            width: 100%;
            height: 100%;
-           background-color: rgba(0, 0, 0, 0.8);
+           background-color: rgba(0, 0, 0, 0.9);
            z-index: 2000;
            justify-content: center;
            align-items: center;
@@ -138,12 +151,13 @@
        .modal-content {
            background: linear-gradient(135deg, #1a1a1a, #333333);
            padding: 30px;
-           border-radius: 10px;
+           border-radius: 15px;
            width: 90%;
            max-width: 400px;
            text-align: center;
-           border: 1px solid gold;
-           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+           border: 2px solid gold;
+           box-shadow: 0 5px 25px rgba(255, 215, 0, 0.3);
+           position: relative;
        }
 
        .modal h2 {
@@ -156,43 +170,65 @@
            margin-bottom: 20px;
            color: #ccc;
            font-size: 14px;
+           line-height: 1.5;
        }
 
        .code-input {
            width: 100%;
-           padding: 12px;
+           padding: 15px;
            margin-bottom: 20px;
            background-color: #0a0a0a;
-           border: 1px solid #444;
-           border-radius: 5px;
+           border: 2px solid #444;
+           border-radius: 8px;
            color: white;
-           font-size: 16px;
+           font-size: 18px;
            text-align: center;
-           letter-spacing: 2px;
+           letter-spacing: 3px;
+           font-weight: bold;
+           transition: all 0.3s ease;
        }
 
        .code-input:focus {
            outline: none;
            border-color: gold;
-           box-shadow: 0 0 5px gold;
+           box-shadow: 0 0 10px gold;
+           transform: scale(1.02);
        }
 
        .submit-btn {
            background: linear-gradient(to right, #000000, #333333);
            color: gold;
-           border: 1px solid rgba(255, 215, 0, 0.5);
-           padding: 10px 20px;
-           border-radius: 5px;
+           border: 2px solid rgba(255, 215, 0, 0.5);
+           padding: 12px 25px;
+           border-radius: 8px;
            cursor: pointer;
            font-size: 16px;
            font-weight: bold;
            transition: all 0.3s ease;
            width: 100%;
+           margin-bottom: 10px;
        }
 
        .submit-btn:hover {
            background: linear-gradient(to right, #333333, #000000);
            transform: scale(1.05);
+           box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+       }
+
+       .close-modal {
+           background: transparent;
+           color: #ccc;
+           border: 1px solid #444;
+           padding: 8px 15px;
+           border-radius: 5px;
+           cursor: pointer;
+           font-size: 14px;
+           transition: all 0.3s ease;
+       }
+
+       .close-modal:hover {
+           background: rgba(255, 0, 0, 0.2);
+           color: white;
        }
 
        .code-toggle {
@@ -215,6 +251,27 @@
        .code-toggle:hover {
            background: linear-gradient(to right, #333333, #000000);
            transform: scale(1.05);
+       }
+
+       .success-animation {
+           animation: successPulse 2s ease-in-out;
+       }
+
+       @keyframes successPulse {
+           0% { transform: scale(1); }
+           50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 0, 0.5); }
+           100% { transform: scale(1); }
+       }
+
+       .success-message {
+           color: #00ff00;
+           font-weight: bold;
+           margin-top: 15px;
+           padding: 10px;
+           background: rgba(0, 255, 0, 0.1);
+           border-radius: 5px;
+           border: 1px solid #00ff00;
+           display: none;
        }
 
        /* TAMBAHAN: Mode Rotate untuk Desktop */
@@ -314,10 +371,13 @@
 <body>
    
    <div class="container">
-       <div class="player-container" >
+       <div class="player-container">
+           <div class="sandbox-indicator" id="sandboxIndicator">
+               ✅ SANDBOX AKTIF
+           </div>
            <iframe class="player-frame" id="wcq" title="Pemutar Video" frameborder="0" 
                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                   allowfullscreen ></iframe>
+                   allowfullscreen></iframe>
        </div>
        
        <div class="chat-container" id="chatContainer">
@@ -328,11 +388,17 @@
 
    <!-- Modal untuk kode unik -->
    <div class="modal" id="codeModal">
-       <div class="modal-content">
-           <h2>Masukkan Kode Unik</h2>
-           <p>Masukkan kode unik untuk mengaktifkan fitur sandbox pada pemutar video</p>
-           <input type="text" class="code-input" id="codeInput" placeholder="Masukkan kode 6 digit" maxlength="6">
-           <button class="submit-btn" id="submitCode">Aktifkan Sandbox</button>
+       <div class="modal-content" id="modalContent">
+           <h2>🔐 Masukkan Kode Unik</h2>
+           <p>Masukkan kode unik 6 digit untuk mengaktifkan fitur sandbox pada pemutar video</p>
+           <input type="text" class="code-input" id="codeInput" placeholder="XXXXXX" maxlength="6" autocomplete="off">
+           <button class="submit-btn" id="submitCode">
+               🚀 Aktifkan Sandbox
+           </button>
+           <div class="success-message" id="successMessage">
+               ✅ Sandbox berhasil diaktifkan! Iframe sekarang lebih aman.
+           </div>
+           <button class="close-modal" id="closeModal">Tutup</button>
        </div>
    </div>
 
@@ -441,7 +507,11 @@
        const codeToggle = document.getElementById('codeToggle');
        const codeInput = document.getElementById('codeInput');
        const submitCode = document.getElementById('submitCode');
+       const closeModal = document.getElementById('closeModal');
        const playerFrame = document.getElementById('wcq');
+       const sandboxIndicator = document.getElementById('sandboxIndicator');
+       const successMessage = document.getElementById('successMessage');
+       const modalContent = document.getElementById('modalContent');
 
        // Kode unik yang valid
        const validCode = "123456";
@@ -449,12 +519,22 @@
        // Buka modal saat tombol kode diklik
        codeToggle.addEventListener('click', function() {
            codeModal.style.display = 'flex';
+           codeInput.focus();
+       });
+
+       // Tutup modal saat tombol tutup diklik
+       closeModal.addEventListener('click', function() {
+           codeModal.style.display = 'none';
+           codeInput.value = '';
+           successMessage.style.display = 'none';
        });
 
        // Tutup modal saat klik di luar konten modal
        codeModal.addEventListener('click', function(e) {
            if (e.target === codeModal) {
                codeModal.style.display = 'none';
+               codeInput.value = '';
+               successMessage.style.display = 'none';
            }
        });
 
@@ -466,23 +546,51 @@
                // Aktifkan sandbox pada iframe
                playerFrame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
                
+               // Tampilkan indikator sandbox
+               sandboxIndicator.style.display = 'block';
+               
+               // Tampilkan pesan sukses di modal
+               successMessage.style.display = 'block';
+               
+               // Animasi sukses pada modal
+               modalContent.classList.add('success-animation');
+               
                // Tampilkan notifikasi sukses
-               showNotification('Sandbox berhasil diaktifkan!', 'success');
+               showNotification('✅ Sandbox berhasil diaktifkan! Iframe sekarang lebih aman.', 'success');
                
-               // Tutup modal
-               codeModal.style.display = 'none';
+               // Nonaktifkan input dan tombol setelah berhasil
+               codeInput.disabled = true;
+               submitCode.disabled = true;
+               submitCode.textContent = '✅ Sandbox Telah Diaktifkan';
+               submitCode.style.background = 'linear-gradient(to right, #006400, #008000)';
                
-               // Reset input
-               codeInput.value = '';
+               // Tutup modal secara otomatis setelah 3 detik
+               setTimeout(() => {
+                   codeModal.style.display = 'none';
+                   codeInput.value = '';
+                   successMessage.style.display = 'none';
+                   modalContent.classList.remove('success-animation');
+               }, 3000);
+               
            } else {
                // Tampilkan notifikasi error
-               showNotification('Kode salah! Silakan coba lagi.', 'error');
+               showNotification('❌ Kode salah! Silakan coba lagi.', 'error');
+               
+               // Animasi shake pada input
+               codeInput.style.borderColor = 'red';
+               codeInput.style.animation = 'shake 0.5s';
                
                // Reset input
                codeInput.value = '';
                
                // Fokus kembali ke input
                codeInput.focus();
+               
+               // Reset animasi setelah selesai
+               setTimeout(() => {
+                   codeInput.style.animation = '';
+                   codeInput.style.borderColor = '#444';
+               }, 500);
            }
        });
 
@@ -493,11 +601,14 @@
            
            // Atur warna berdasarkan jenis notifikasi
            if (type === 'success') {
-               notification.style.borderLeftColor = 'green';
+               notification.style.borderLeftColor = '#00ff00';
+               notification.style.background = 'rgba(0, 128, 0, 0.8)';
            } else if (type === 'error') {
                notification.style.borderLeftColor = 'red';
+               notification.style.background = 'rgba(128, 0, 0, 0.8)';
            } else {
                notification.style.borderLeftColor = 'gold';
+               notification.style.background = 'rgba(0, 0, 0, 0.8)';
            }
            
            // Tampilkan notifikasi
@@ -515,6 +626,17 @@
                submitCode.click();
            }
        });
+
+       // Animasi shake untuk error
+       const style = document.createElement('style');
+       style.textContent = `
+           @keyframes shake {
+               0%, 100% { transform: translateX(0); }
+               25% { transform: translateX(-5px); }
+               75% { transform: translateX(5px); }
+           }
+       `;
+       document.head.appendChild(style);
    </script>
     <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
   
