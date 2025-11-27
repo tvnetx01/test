@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Generator JSON Kode SHA-256</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<style>
+body { font-family: Arial; background: #1a1a1a; color: gold; padding: 20px; }
+input, button, textarea { width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px; border: 1px solid #555; background: #222; color: gold; }
+textarea { height: 150px; }
+</style>
+</head>
+<body>
+
+<h2>Generator JSON Kode SHA-256</h2>
+
+<label>Masukkan kode (pisahkan enter untuk banyak kode):</label>
+<textarea id="plainCodes" placeholder="contoh: 123456&#10;654321"></textarea>
+
+<button id="generate">Generate JSON</button>
+
+<h3>Hasil JSON:</h3>
+<textarea id="jsonOutput" readonly></textarea>
+
+<script>
+document.getElementById("generate").addEventListener("click", () => {
+    const input = document.getElementById("plainCodes").value.trim();
+    if (!input) return alert("Masukkan minimal satu kode!");
+    
+    const codes = input.split("\n").map(c => c.trim()).filter(c => c);
+    const hashArray = codes.map(c => CryptoJS.SHA256(c).toString());
+    
+    const json = { kode: hashArray };
+    document.getElementById("jsonOutput").value = JSON.stringify(json, null, 2);
+});
+</script>
+
+</body>
+</html>
