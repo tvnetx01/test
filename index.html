@@ -419,18 +419,16 @@ document.addEventListener("DOMContentLoaded", () => {
             // Jika kode tersimpan valid, aktifkan sandbox langsung
             if (savedHash && daftarKode.includes(savedHash)) {
                 applySandbox();
-                modal.style.display = "none"; // modal tetap tersembunyi
+                // modal tetap tersembunyi sampai tombol ditekan
             } else {
-                // kode belum valid atau sudah tidak ada → tampilkan modal
-                modal.style.display = "flex";
+                // kode belum valid atau sudah tidak ada → modal tetap tersembunyi
                 localStorage.removeItem(STORAGE_KEY);
                 localStorage.removeItem(STORAGE_CODE);
             }
         })
         .catch(err => {
             console.error("Gagal memuat kode eksternal", err);
-            // fallback: tampilkan modal agar user bisa input manual
-            modal.style.display = "flex";
+            // fallback: modal tetap tersembunyi
         });
 
     // Event listener tombol verifikasi
@@ -439,6 +437,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Tombol skip modal
     skip.addEventListener("click", () => { modal.style.display = "none"; });
+
+    // Tombol buka modal (hanya muncul saat ditekan)
+    document.getElementById("kodeToggle").addEventListener("click", () => {
+        modal.style.display = "flex";
+    });
 
     function verifikasiKode() {
         const val = input.value.trim();
@@ -472,7 +475,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Sandbox diaktifkan.");
     }
 });
-
 
 
 
