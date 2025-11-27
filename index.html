@@ -252,15 +252,17 @@
        💬 Chat
    </button>
 
-   <!-- Modal Input Kode -->
-<div id="kodeModal" class="kode-modal">
+<!-- ========== MODAL INPUT KODE (paste ini sekali) ========== -->
+<div id="kodeModal" class="kode-modal" style="display:flex;">
     <div class="kode-box">
-        <h3>Masukkan Kode Akses</h3>
+        <h3 style="color:gold; margin-bottom:8px;">Masukkan Kode Akses</h3>
         <input type="password" id="kodeInput" placeholder="Masukkan kode..." />
         <button id="kodeSubmit">Verifikasi</button>
-        <p id="kodeError" style="color:red; display:none; margin-top:10px;">Kode salah!</p>
+        <p id="kodeMsg" style="color:#ffb3b3; display:none; margin-top:10px;"></p>
+        <p style="font-size:12px; color:#aaa; margin-top:8px;">Masukkan kode untuk mengaktifkan sandbox pemutar.</p>
     </div>
 </div>
+
 
    <!-- Tombol Popup -->
    <a href="https://www.profitableratecpm.com/g2w7ut1hm4?key=53a1b14dfd7afcf9793564250efbef70" 
@@ -354,24 +356,114 @@
 
       // ======= SISTEM KODE UNIK =======
 
-const KODE_BENAR = "123456";
+document.addEventListener('DOMContentLoaded', () => {
+    // ====== KONFIGURASI ======
+    const KODE_BENAR = "123456";         // ubah kode di sini jika perlu
+    const MAX_ATTEMPTS = 3;
+    const STORAGE_KEY = "kodeSandboxAktif"; // localStorage key
 
-document.getElementById("kodeSubmit").addEventListener("click", () => {
-    const input = document.getElementById("kodeInput").value.trim();
-    const error = document.getElementById("kodeError");
+    // Elemen modal
+    const modal = document.getElementById('kodeModal');
+    const input = document.getElementById('kodeInput');
+    const btn = document.getElementById('kodeSubmit');
+    const msg = document.getElementById('kodeMsg');
 
-    if (input === KODE_BENAR) {
-        error.style.display = "none";
+    // Cek kalau sudah pernah mengaktifkan sebelumnya
+    try {
+        const aktif = localStorage.getItem(STORAGE_KEY);
+        if (aktif === '1') {
+            // langsung aktifkan tanpa minta kode
+            applySandboxToIframe();
+            modal.style.display = 'none';
+            return;
+        }
+    } catch (e) {
+        console.warn('localStorage tidak tersedia', e);
+    }
+    // Simpan counter percobaan di session (agar tidak permanen)
+    let attempts = 0;
+    const tryLimitKey = 'kodeAttempts';
+    try {
+        attempts = parseInt(sessionStorage.getItem(tryLimitKey) || '0', 10);
+    } catch (e) {
+        attempts = 0;
+    }
 
-        // Tambahkan sandbox ke iframe
-        const iframe = document.getElementById("wcq");
-        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+    // Tombol submit
+    btn.addEventListener('click', handleSubmit);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSubmit(); });
 
-        // Tutup modal kode
-        document.getElementById("kodeModal").style.display = "none";
+    function showMessage(text, isError = true) {
+        msg.style.display = 'block';
+        msg.style.color = isError ? '#ffb3b3' : '#b3ffb3';
+        msg.textContent = text;
+    }
 
-    } else {
-        error.style.display = "block";
+    function handleSubmit() {
+        const val = (input.value || '').trim();
+        if (!val) {
+            showMessage('Masukkan kode terlebih dahulu.', true);
+            return;
+        } 
+        attempts += 1;
+        try { sessionStorage.setItem(tryLimitKey, String(attempts)); } catch (e) {}
+
+        if (val === KODE_BENAR) {
+            // sukses
+            showMessage('Kode benar — sandbox diaktifkan!', false);
+
+            applySandboxToIframe();
+
+            // simpan supaya tidak perlu input lagi (optional)
+            try { localStorage.setItem(STORAGE_KEY, '1'); } catch(e){}
+
+            // tutup modal setelah delay kecil
+            setTimeout(() => { modal.style.display = 'none'; }, 700);
+        } else {
+            // salah
+            if (attempts >= MAX_ATTEMPTS) {
+                showMessage('Kode salah. Batas percobaan tercapai. Reload halaman untuk mencoba lagi.', true);
+                btn.disabled = true;
+                input.disabled = true;
+            } else {
+                showMessage(`Kode salah. Percobaan ${attempts}/${MAX_ATTEMPTS}.`, true);
+                // animasi kecil untuk input
+                input.style.animation = 'shake 0.3s';
+                setTimeout(()=> { input.style.animation = ''; }, 350);
+            }
+        }
+    }
+ // Fungsi yang menambahkan sandbox ke iframe (dengan fallback pencarian)
+    function applySandboxToIframe() {
+        // Cari iframe dengan id 'wcq' dulu, kalau tidak ada pakai class player-frame
+        let iframe = document.getElementById('wcq');
+        if (!iframe) {
+            iframe = document.querySelector('.player-frame');
+        }
+
+        if (!iframe) {
+            console.error('Iframe player tidak ditemukan. Pastikan ada <iframe id="wcq"> atau class="player-frame".');
+            showMessage('Gagal: iframe pemain tidak ditemukan di halaman.', true);
+            return;
+        }
+
+        // Tambahkan atribut sandbox — jika sudah ada sandbox, gabungkan
+        const existing = iframe.getAttribute('sandbox') || '';
+        const needed = 'allow-scripts allow-same-origin';
+        // jika sudah mengandung, lewati
+        if (!existing.includes('allow-scripts') || !existing.includes('allow-same-origin')) {
+            // gabungkan (jaga agar tidak duplikat)
+            const parts = new Set(existing.split(/\s+/).filter(Boolean));
+            needed.split(/\s+/).forEach(p => parts.add(p));
+            iframe.setAttribute('sandbox', Array.from(parts).join(' '));
+        }
+// Optional: jika id bukan wcq, set juga id supaya skrip lain yang cari wcq tetap dapat menemukan
+        try {
+            if (!iframe.id) iframe.id = 'wcq';
+        } catch (e) {}
+
+        // Beri umpan balik ke user (bisa diganti pake UI lain)
+        console.log('Sandbox applied to iframe:', iframe);
     }
 });
 
