@@ -398,7 +398,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const URL_KODE = "https://test-5z0.pages.dev/kode.js";  
     const STORAGE_KEY = "sandbox_aktif";
-    const STORAGE_CODE = "sandbox_kode"; // simpan kode terakhir yang berhasil
+    const STORAGE_CODE = "sandbox_kode"; // hash kode terakhir
     let daftarKode = [];
 
     const modal = document.getElementById("kodeModal");
@@ -415,14 +415,16 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Daftar kode terbaru dimuat:", daftarKode);
 
             const savedHash = localStorage.getItem(STORAGE_CODE);
-            
-            // Jika kode lama tidak ada di daftar terbaru, tampilkan modal
-            if (!savedHash || !daftarKode.includes(savedHash)) {
-                modal.style.display = "flex";
-                localStorage.removeItem(STORAGE_KEY); // hapus status sandbox lama
-                localStorage.removeItem(STORAGE_CODE);
-            } else {
+
+            // Jika kode tersimpan valid, aktifkan sandbox langsung
+            if (savedHash && daftarKode.includes(savedHash)) {
                 applySandbox();
+                modal.style.display = "none"; // modal tetap tersembunyi
+            } else {
+                // kode belum valid atau sudah tidak ada → tampilkan modal
+                modal.style.display = "flex";
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(STORAGE_CODE);
             }
         })
         .catch(err => {
@@ -431,8 +433,11 @@ document.addEventListener("DOMContentLoaded", () => {
             modal.style.display = "flex";
         });
 
+    // Event listener tombol verifikasi
     submit.addEventListener("click", verifikasiKode);
     input.addEventListener("keydown", e => { if (e.key === "Enter") verifikasiKode(); });
+
+    // Tombol skip modal
     skip.addEventListener("click", () => { modal.style.display = "none"; });
 
     function verifikasiKode() {
@@ -445,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tampilkanPesan("Kode benar! Sandbox aktif.", false);
             applySandbox();
             localStorage.setItem(STORAGE_KEY, "1");
-            localStorage.setItem(STORAGE_CODE, hashInput); // simpan kode yang valid
+            localStorage.setItem(STORAGE_CODE, hashInput); // simpan kode valid
             setTimeout(() => { modal.style.display = "none"; }, 700);
         } else {
             tampilkanPesan("Kode salah! Silakan coba lagi.", true);
@@ -467,6 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Sandbox diaktifkan.");
     }
 });
+
 
 
       
