@@ -43,14 +43,23 @@
            position: absolute;
            top: 10px;
            left: 10px;
-           background: rgba(0, 128, 0, 0.8);
+           background: rgba(0, 128, 0, 0.9);
            color: white;
-           padding: 5px 10px;
-           border-radius: 5px;
-           font-size: 12px;
+           padding: 8px 15px;
+           border-radius: 8px;
+           font-size: 14px;
+           font-weight: bold;
            z-index: 10;
            display: none;
-           border: 1px solid #00ff00;
+           border: 2px solid #00ff00;
+           box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+           animation: glow 2s infinite;
+       }
+
+       @keyframes glow {
+           0% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+           50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
+           100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
        }
 
        .chat-container {
@@ -125,13 +134,16 @@
            top: 20px;
            left: 50%;
            transform: translateX(-50%);
-           background-color: rgba(0, 0, 0, 0.8);
+           background-color: rgba(0, 0, 0, 0.9);
            color: white;
-           padding: 10px 20px;
-           border-radius: 5px;
+           padding: 15px 25px;
+           border-radius: 10px;
            z-index: 1001;
            display: none;
-           border-left: 4px solid gold;
+           border: 2px solid;
+           font-weight: bold;
+           text-align: center;
+           min-width: 300px;
        }
 
        /* Modal untuk kode unik */
@@ -142,48 +154,49 @@
            left: 0;
            width: 100%;
            height: 100%;
-           background-color: rgba(0, 0, 0, 0.9);
+           background-color: rgba(0, 0, 0, 0.95);
            z-index: 2000;
            justify-content: center;
            align-items: center;
        }
 
        .modal-content {
-           background: linear-gradient(135deg, #1a1a1a, #333333);
-           padding: 30px;
-           border-radius: 15px;
+           background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+           padding: 40px;
+           border-radius: 20px;
            width: 90%;
-           max-width: 400px;
+           max-width: 450px;
            text-align: center;
-           border: 2px solid gold;
-           box-shadow: 0 5px 25px rgba(255, 215, 0, 0.3);
+           border: 3px solid gold;
+           box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
            position: relative;
        }
 
        .modal h2 {
            margin-bottom: 20px;
            color: gold;
-           font-size: 24px;
+           font-size: 28px;
+           text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
        }
 
        .modal p {
-           margin-bottom: 20px;
-           color: #ccc;
-           font-size: 14px;
-           line-height: 1.5;
+           margin-bottom: 25px;
+           color: #ddd;
+           font-size: 16px;
+           line-height: 1.6;
        }
 
        .code-input {
            width: 100%;
-           padding: 15px;
-           margin-bottom: 20px;
+           padding: 18px;
+           margin-bottom: 25px;
            background-color: #0a0a0a;
-           border: 2px solid #444;
-           border-radius: 8px;
+           border: 3px solid #444;
+           border-radius: 12px;
            color: white;
-           font-size: 18px;
+           font-size: 20px;
            text-align: center;
-           letter-spacing: 3px;
+           letter-spacing: 4px;
            font-weight: bold;
            transition: all 0.3s ease;
        }
@@ -191,44 +204,52 @@
        .code-input:focus {
            outline: none;
            border-color: gold;
-           box-shadow: 0 0 10px gold;
+           box-shadow: 0 0 20px gold;
            transform: scale(1.02);
        }
 
        .submit-btn {
-           background: linear-gradient(to right, #000000, #333333);
+           background: linear-gradient(45deg, #000000, #333333);
            color: gold;
-           border: 2px solid rgba(255, 215, 0, 0.5);
-           padding: 12px 25px;
-           border-radius: 8px;
+           border: 2px solid rgba(255, 215, 0, 0.6);
+           padding: 15px 30px;
+           border-radius: 12px;
            cursor: pointer;
-           font-size: 16px;
+           font-size: 18px;
            font-weight: bold;
            transition: all 0.3s ease;
            width: 100%;
-           margin-bottom: 10px;
+           margin-bottom: 15px;
        }
 
        .submit-btn:hover {
-           background: linear-gradient(to right, #333333, #000000);
+           background: linear-gradient(45deg, #333333, #000000);
            transform: scale(1.05);
-           box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+           box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+       }
+
+       .submit-btn.success {
+           background: linear-gradient(45deg, #006400, #008000);
+           border-color: #00ff00;
+           color: white;
        }
 
        .close-modal {
            background: transparent;
            color: #ccc;
-           border: 1px solid #444;
-           padding: 8px 15px;
-           border-radius: 5px;
+           border: 1px solid #666;
+           padding: 10px 20px;
+           border-radius: 8px;
            cursor: pointer;
            font-size: 14px;
            transition: all 0.3s ease;
+           width: 100%;
        }
 
        .close-modal:hover {
            background: rgba(255, 0, 0, 0.2);
            color: white;
+           border-color: #ff4444;
        }
 
        .code-toggle {
@@ -258,20 +279,50 @@
        }
 
        @keyframes successPulse {
-           0% { transform: scale(1); }
-           50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 0, 0.5); }
-           100% { transform: scale(1); }
+           0% { 
+               transform: scale(1); 
+               box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+           }
+           50% { 
+               transform: scale(1.03); 
+               box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
+               border-color: #00ff00;
+           }
+           100% { 
+               transform: scale(1); 
+               box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+           }
        }
 
        .success-message {
            color: #00ff00;
            font-weight: bold;
-           margin-top: 15px;
-           padding: 10px;
+           font-size: 18px;
+           margin: 20px 0;
+           padding: 15px;
            background: rgba(0, 255, 0, 0.1);
-           border-radius: 5px;
-           border: 1px solid #00ff00;
+           border-radius: 10px;
+           border: 2px solid #00ff00;
            display: none;
+           animation: textGlow 1.5s infinite;
+       }
+
+       @keyframes textGlow {
+           0%, 100% { text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+           50% { text-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
+       }
+
+       .status-check {
+           margin-top: 20px;
+           padding: 10px;
+           background: rgba(255, 255, 255, 0.1);
+           border-radius: 8px;
+           font-size: 14px;
+       }
+
+       .status-check span {
+           font-weight: bold;
+           color: gold;
        }
 
        /* TAMBAHAN: Mode Rotate untuk Desktop */
@@ -373,7 +424,7 @@
    <div class="container">
        <div class="player-container">
            <div class="sandbox-indicator" id="sandboxIndicator">
-               ✅ SANDBOX AKTIF
+               🛡️ SANDBOX MODE AKTIF - AMAN
            </div>
            <iframe class="player-frame" id="wcq" title="Pemutar Video" frameborder="0" 
                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -389,14 +440,18 @@
    <!-- Modal untuk kode unik -->
    <div class="modal" id="codeModal">
        <div class="modal-content" id="modalContent">
-           <h2>🔐 Masukkan Kode Unik</h2>
-           <p>Masukkan kode unik 6 digit untuk mengaktifkan fitur sandbox pada pemutar video</p>
-           <input type="text" class="code-input" id="codeInput" placeholder="XXXXXX" maxlength="6" autocomplete="off">
+           <h2>🔐 AKTIFKAN SANDBOX MODE</h2>
+           <p>Masukkan kode unik 6 digit untuk mengaktifkan fitur keamanan sandbox pada pemutar video</p>
+           <input type="text" class="code-input" id="codeInput" placeholder="123456" maxlength="6" autocomplete="off">
            <button class="submit-btn" id="submitCode">
-               🚀 Aktifkan Sandbox
+               🚀 AKTIFKAN SANDBOX
            </button>
            <div class="success-message" id="successMessage">
-               ✅ Sandbox berhasil diaktifkan! Iframe sekarang lebih aman.
+               ✅ SANDBOX BERHASIL DIAKTIFKAN!<br>
+               Iframe sekarang dalam mode aman
+           </div>
+           <div class="status-check" id="statusCheck">
+               Status Sandbox: <span id="sandboxStatus">Tidak Aktif</span>
            </div>
            <button class="close-modal" id="closeModal">Tutup</button>
        </div>
@@ -409,7 +464,7 @@
 
    <!-- Tombol untuk membuka modal kode -->
    <button class="code-toggle" id="codeToggle">
-       🔐 Kode
+       🔐 Sandbox
    </button>
 
    <!-- Tombol Popup -->
@@ -470,7 +525,6 @@
            
            if (chatVisible) {
                chatContainer.classList.add('active');
-               // TAMBAHAN: Update teks tombol untuk desktop
                if (window.innerWidth >= 768) {
                    this.innerHTML = '❌ Close Chat';
                } else {
@@ -478,7 +532,6 @@
                }
            } else {
                chatContainer.classList.remove('active');
-               // TAMBAHAN: Update teks tombol untuk desktop
                if (window.innerWidth >= 768) {
                    this.innerHTML = '💬 Chat';
                } else {
@@ -490,7 +543,6 @@
        // TAMBAHAN: Deteksi orientasi layar
        function handleOrientation() {
            if (window.innerWidth >= 768) {
-               // Mode desktop - aktifkan chat secara default
                if (!chatContainer.classList.contains('active')) {
                    chatContainer.classList.add('active');
                    chatVisible = true;
@@ -512,14 +564,29 @@
        const sandboxIndicator = document.getElementById('sandboxIndicator');
        const successMessage = document.getElementById('successMessage');
        const modalContent = document.getElementById('modalContent');
+       const sandboxStatus = document.getElementById('sandboxStatus');
+       const statusCheck = document.getElementById('statusCheck');
 
        // Kode unik yang valid
        const validCode = "123456";
+
+       // Update status sandbox
+       function updateSandboxStatus() {
+           const hasSandbox = playerFrame.hasAttribute('sandbox');
+           if (hasSandbox) {
+               sandboxStatus.textContent = 'AKTIF';
+               sandboxStatus.style.color = '#00ff00';
+           } else {
+               sandboxStatus.textContent = 'Tidak Aktif';
+               sandboxStatus.style.color = '#ff4444';
+           }
+       }
 
        // Buka modal saat tombol kode diklik
        codeToggle.addEventListener('click', function() {
            codeModal.style.display = 'flex';
            codeInput.focus();
+           updateSandboxStatus();
        });
 
        // Tutup modal saat tombol tutup diklik
@@ -555,26 +622,33 @@
                // Animasi sukses pada modal
                modalContent.classList.add('success-animation');
                
+               // Update status
+               updateSandboxStatus();
+               
+               // Ubah tombol submit
+               submitCode.textContent = '✅ SANDBOX AKTIF';
+               submitCode.classList.add('success');
+               
                // Tampilkan notifikasi sukses
-               showNotification('✅ Sandbox berhasil diaktifkan! Iframe sekarang lebih aman.', 'success');
+               showNotification('🎉 SANDBOX BERHASIL DIAKTIFKAN! Iframe sekarang dalam mode aman', 'success');
                
-               // Nonaktifkan input dan tombol setelah berhasil
+               // Nonaktifkan input
                codeInput.disabled = true;
-               submitCode.disabled = true;
-               submitCode.textContent = '✅ Sandbox Telah Diaktifkan';
-               submitCode.style.background = 'linear-gradient(to right, #006400, #008000)';
                
-               // Tutup modal secara otomatis setelah 3 detik
+               // Tutup modal secara otomatis setelah 4 detik
                setTimeout(() => {
                    codeModal.style.display = 'none';
                    codeInput.value = '';
                    successMessage.style.display = 'none';
                    modalContent.classList.remove('success-animation');
-               }, 3000);
+               }, 4000);
+               
+               // Debug: Cek apakah sandbox benar-benar diterapkan
+               console.log('Sandbox activated:', playerFrame.getAttribute('sandbox'));
                
            } else {
                // Tampilkan notifikasi error
-               showNotification('❌ Kode salah! Silakan coba lagi.', 'error');
+               showNotification('❌ KODE SALAH! Silakan coba lagi.', 'error');
                
                // Animasi shake pada input
                codeInput.style.borderColor = 'red';
@@ -601,23 +675,22 @@
            
            // Atur warna berdasarkan jenis notifikasi
            if (type === 'success') {
-               notification.style.borderLeftColor = '#00ff00';
-               notification.style.background = 'rgba(0, 128, 0, 0.8)';
+               notification.style.borderColor = '#00ff00';
+               notification.style.background = 'rgba(0, 128, 0, 0.9)';
+               notification.style.color = '#ffffff';
            } else if (type === 'error') {
-               notification.style.borderLeftColor = 'red';
-               notification.style.background = 'rgba(128, 0, 0, 0.8)';
-           } else {
-               notification.style.borderLeftColor = 'gold';
-               notification.style.background = 'rgba(0, 0, 0, 0.8)';
+               notification.style.borderColor = '#ff4444';
+               notification.style.background = 'rgba(128, 0, 0, 0.9)';
+               notification.style.color = '#ffffff';
            }
            
            // Tampilkan notifikasi
            notification.style.display = 'block';
            
-           // Sembunyikan setelah 3 detik
+           // Sembunyikan setelah 4 detik
            setTimeout(() => {
                notification.style.display = 'none';
-           }, 3000);
+           }, 4000);
        }
 
        // Submit kode saat tekan Enter
@@ -632,11 +705,14 @@
        style.textContent = `
            @keyframes shake {
                0%, 100% { transform: translateX(0); }
-               25% { transform: translateX(-5px); }
-               75% { transform: translateX(5px); }
+               25% { transform: translateX(-8px); }
+               75% { transform: translateX(8px); }
            }
        `;
        document.head.appendChild(style);
+
+       // Inisialisasi status
+       updateSandboxStatus();
    </script>
     <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
   
