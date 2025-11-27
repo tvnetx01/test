@@ -251,9 +251,27 @@
    <button class="chat-toggle" id="chatToggle">
        💬 Chat
    </button>
+<button class="chat-toggle" id="kodeToggle" style="
+    position: fixed;
+    bottom: 140px;
+    right: 20px;
+    padding: 10px 15px;
+    background: linear-gradient(to right, #000000, #333333);
+    color: gold;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    border-radius: 50px;
+    cursor: pointer;
+    z-index: 1000;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+">
+   🔑 Kode
+</button>
 
 <!-- ========== MODAL INPUT KODE (paste ini sekali) ========== -->
-<div id="kodeModal" class="kode-modal" style="display:flex;">
+<div id="kodeModal" class="kode-modal" style="display:none;">
+
     <div class="kode-box">
         <h3 style="color:gold; margin-bottom:8px;">Masukkan Kode Akses</h3>
 
@@ -481,6 +499,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+      // Tombol buka modal kode
+document.getElementById("kodeToggle").addEventListener("click", () => {
+    document.getElementById("kodeModal").style.display = "flex";
+});
+
+// Tombol skip tetap menutup modal
+document.getElementById("kodeSkip").addEventListener("click", () => {
+    document.getElementById("kodeModal").style.display = "none";
+});
+
 </script>
 
     <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
