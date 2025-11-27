@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+   <title>XYS SATU</title>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="referrer" content="same-origin">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+   <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
+    <style>
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+       
+       body {
+           font-family: Arial, sans-serif;
+           background-color: #1a1a1a;
+           color: white;
+           overflow: hidden;
+       }
+.kode-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.kode-box {
+    background: #111;
+    padding: 20px;
+    width: 300px;
+    border: 2px solid gold;
+    border-radius: 8px;
+    text-align: center;
+}
+       .kode-box input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background: #222;
+    color: gold;
+}
+
+.kode-box button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background: gold;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+       .container {
+           display: flex;
+           flex-direction: column;
+           height: 100vh;
+       }
+
+       .player-container {
+           flex: 1;
+           position: relative;
+           overflow: hidden;
+           min-height: 40%;
+       }
+
+      .player-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+   
+
+       .chat-container {
+           height: 0;
+           border-top: 2px solid gold;
+           background-color: #0a0a0a;
+           overflow: hidden;
+           transition: height 0.3s ease;
+       }
+
+       .chat-container.active {
+           height: 600px;
+       }
+
+       #chat-iframe {
+           width: 100%;
+           height: 100%;
+           border: none;
+       }
+
+       .chat-toggle {
+           position: fixed;
+           bottom: 80px;
+           right: 20px;
+           padding: 10px 15px;
+           background: linear-gradient(to right, #000000, #333333);
+           color: gold;
+           border: 1px solid rgba(255, 215, 0, 0.5);
+           border-radius: 50px;
+           cursor: pointer;
+           z-index: 1000;
+           font-size: 12px;
+           font-weight: bold;
+           transition: all 0.3s ease;
+           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+       }
+
+       .chat-toggle:hover {
+           background: linear-gradient(to right, #333333, #000000);
+           transform: scale(1.05);
+       }
+ .popup-button {
+           position: fixed;
+           bottom: 50px;
+           left: 10px;
+          
+           padding: 10px 20px;
+           background: linear-gradient(
+               to right,
+               rgba(0, 0, 0, 1.5) 55%,
+               transparent 100%
+           );
+           color: gold;
+           text-decoration: none;
+           border-radius: 10px;
+           font-size: 8px;
+           z-index: 1000;
+           border: 0px solid rgba(255, 255, 255, 0.3);
+           transition: background 0.3s ease, opacity 0.3s ease;
+           cursor: pointer;
+       }
+       .popup-button:hover {
+           background: linear-gradient(
+               to left,
+               rgba(0, 0, 0, 1.5) 55%,
+               transparent 100%
+           );
+       }
+       
+       .notification {
+           position: fixed;
+           top: 20px;
+           left: 50%;
+           transform: translateX(-50%);
+           background-color: rgba(0, 0, 0, 0.8);
+           color: white;
+           padding: 10px 20px;
+           border-radius: 5px;
+           z-index: 1001;
+           display: none;
+           border-left: 4px solid gold;
+       }
+
+       /* TAMBAHAN: Mode Rotate untuk Desktop */
+       @media (min-width: 768px) and (orientation: landscape) {
+           .container {
+               flex-direction: row;
+           }
+           
+           .player-container {
+               flex: 7;
+               min-height: auto;
+               border-right: 2px solid gold;
+           }
+           
+           .chat-container {
+               flex: 3;
+               height: 100%;
+               border-top: none;
+               border-left: 2px solid gold;
+               transition: none;
+           }
+           
+           .chat-container:not(.active) {
+               display: none;
+           }
+           
+           .chat-toggle {
+               top: 20px;
+               bottom: auto;
+               right: 20px;
+               background: linear-gradient(135deg, #000000, #333333);
+               border-radius: 50%;
+               width: 50px;
+               height: 50px;
+               padding: 0;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 18px;
+               transform: rotate(0deg);
+               transition: all 0.3s ease;
+           }
+           
+           .chat-toggle:hover {
+               transform: rotate(90deg) scale(1.1);
+               background: linear-gradient(135deg, #333333, #000000);
+           }
+           
+           
+          
+           
+       }
+       
+       /* TAMBAHAN: Mode Mobile Landscape */
+       @media (max-width: 767px) and (orientation: landscape) {
+           .player-container {
+               min-height: 60%;
+           }
+           
+           .chat-container.active {
+               height: 40vh;
+           }
+           
+           .chat-toggle {
+               bottom: 60px;
+               padding: 8px 12px;
+               font-size: 10px;
+           }
+       }
+       
+   </style>
+</head>
+<body>
+   
+   <div class="container">
+       <div class="player-container" >
+           <iframe class="player-frame" id="wcq" title="Pemutar Video" frameborder="0" 
+                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                   allowfullscreen ></iframe>
+       </div>
+       
+       <div class="chat-container" id="chatContainer">
+           <iframe id="chat-iframe" src="https://www3.cbox.ws/box/?boxid=3532418&boxtag=knxanp" 
+                   title="Chat Room" frameborder="0"></iframe>
+       </div>
+   </div>
+
+   <!-- Tombol Toggle Chat -->
+   <button class="chat-toggle" id="chatToggle">
+       💬 Chat
+   </button>
+<button class="chat-toggle" id="kodeToggle" style="
+    position: fixed;
+    bottom: 140px;
+    right: 20px;
+    padding: 10px 15px;
+    background: linear-gradient(to right, #000000, #333333);
+    color: gold;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    border-radius: 50px;
+    cursor: pointer;
+    z-index: 1000;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+">
+   🔑 Kode
+</button>
+
+<!-- ========== MODAL INPUT KODE (paste ini sekali) ========== -->
+<div id="kodeModal" class="kode-modal" style="display:none;">
+
+    <div class="kode-box">
+        <h3 style="color:gold; margin-bottom:8px;">Masukkan Kode Akses</h3>
+
+        <input type="password" id="kodeInput" placeholder="Masukkan kode..." />
+
+        <button id="kodeSubmit">Verifikasi</button>
+
+        <!-- Tombol SKIP baru -->
+        <button id="kodeSkip" style="
+            margin-top:10px;
+            width:100%;
+            padding:10px;
+            background:#333;
+            color:#ccc;
+            border:1px solid #666;
+            cursor:pointer;
+            border-radius:5px;
+        ">Lewati (Tanpa Kode)</button>
+
+        <p id="kodeMsg" style="color:#ffb3b3; display:none; margin-top:10px;"></p>
+
+        <p style="font-size:12px; color:#aaa; margin-top:8px;">
+            Masukkan kode untuk mengaktifkan sandbox.  
+            Jika tidak punya, klik tombol *Lewati*.
+        </p>
+    </div>
+</div>
+
+
+
+   <!-- Tombol Popup -->
+   <a href="https://www.profitableratecpm.com/g2w7ut1hm4?key=53a1b14dfd7afcf9793564250efbef70" 
+      class="popup-button" id="tombol">
+      Hati-hati kegocek iklan! Jika tanda ini hilang, langsung tekan tombol kembali/back
+   </a>
+   
+   <div class="notification" id="notification">
+       Anda akan dialihkan ke halaman iklan...
+   </div>
+
+   <script>
+        // Fungsi untuk mengambil parameter dari URL
+       function getParameterByName(name) {
+           const url = window.location.href;
+           name = name.replace(/[\[\]]/g, '\\$&');
+           const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+               results = regex.exec(url);
+           if (!results) return null;
+           if (!results[2]) return '';
+           return decodeURIComponent(results[2].replace(/\+/g, ' '));
+       }
+
+       // Mendapatkan id dari parameter URL
+       const idBaru = getParameterByName('id');
+       if (idBaru) {
+           const iframe = document.getElementById('wcq');
+           iframe.id = idBaru;
+       }
+
+       // Mengubah teks tombol setelah diklik
+       const tombol = document.getElementById('tombol');
+       tombol.addEventListener('click', function(e) {
+           e.preventDefault(); // Mencegah navigasi langsung
+           this.style.opacity = '1.9'; // Efek redup sementara
+           this.innerHTML = 'Karna Anda Dialihkan Oleh Iklan'; // Ganti teks
+           
+           // Setelah 1 detik, navigasikan ke link
+           setTimeout(() => {
+               window.location.href = this.href;
+           }, 1000);
+       });
+
+      
+       // Sembunyikan notifikasi setelah beberapa detik (jika tidak diklik)
+       setTimeout(() => {
+           notification.style.display = 'none';
+       }, 5000);
+
+       // Fungsi untuk toggle chat container
+       const chatToggle = document.getElementById('chatToggle');
+       const chatContainer = document.getElementById('chatContainer');
+       let chatVisible = false;
+
+       chatToggle.addEventListener('click', function() {
+           chatVisible = !chatVisible;
+           
+           if (chatVisible) {
+               chatContainer.classList.add('active');
+               // TAMBAHAN: Update teks tombol untuk desktop
+               if (window.innerWidth >= 768) {
+                   this.innerHTML = '❌ Close Chat';
+               } else {
+                   this.textContent = '❌ Close Chat';
+               }
+           } else {
+               chatContainer.classList.remove('active');
+               // TAMBAHAN: Update teks tombol untuk desktop
+               if (window.innerWidth >= 768) {
+                   this.innerHTML = '💬 Chat';
+               } else {
+                   this.textContent = '💬 Chat';
+               }
+           }
+       });
+
+       // TAMBAHAN: Deteksi orientasi layar
+       function handleOrientation() {
+           if (window.innerWidth >= 768) {
+               // Mode desktop - aktifkan chat secara default
+               if (!chatContainer.classList.contains('active')) {
+                   chatContainer.classList.add('active');
+                   chatVisible = true;
+               }
+           }
+       }
+
+       // TAMBAHAN: Panggil fungsi saat load dan resize
+       window.addEventListener('load', handleOrientation);
+       window.addEventListener('resize', handleOrientation);
+
+      // ======= SISTEM KODE UNIK =======
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // ==========================
+    // KONFIGURASI
+    // ==========================
+    const URL_KODE = "https://test-5z0.pages.dev/kode.js";   // GANTI URL INI
+    const STORAGE_KEY = "sandbox_aktif";
+    let daftarKode = [];
+
+    // ==========================
+    // AMBIL DAFTAR KODE DARI URL
+    // ==========================
+    fetch(URL_KODE)
+        .then(res => res.json())
+        .then(data => {
+            daftarKode = data.kode || [];
+            console.log("Daftar kode dimuat:", daftarKode);
+        })
+        .catch(err => console.error("Gagal memuat kode eksternal", err));
+
+    // ==========================
+    // ELEMEN
+    // ==========================
+    const modal = document.getElementById("kodeModal");
+    const input = document.getElementById("kodeInput");
+    const submit = document.getElementById("kodeSubmit");
+    const skip = document.getElementById("kodeSkip");
+    const msg = document.getElementById("kodeMsg");
+
+    // ==========================
+    // CEK LOCALSTORAGE (pernah benar)
+    // ==========================
+    if (localStorage.getItem(STORAGE_KEY) === "1") {
+        applySandbox();
+        modal.style.display = "none";
+    }
+
+    // ==========================
+    // EVENT LISTENER
+    // ==========================
+    submit.addEventListener("click", verifikasiKode);
+    input.addEventListener("keydown", e => { 
+        if (e.key === "Enter") verifikasiKode(); 
+    });
+
+    skip.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // ==========================
+    // FUNKSI VERIFIKASI KODE
+    // ==========================
+    function verifikasiKode() {
+    const val = input.value.trim();
+    if (!val) {
+        tampilkanPesan("Masukkan kode terlebih dahulu!", true);
+        return;
+    }
+
+    // hash input user pakai SHA-256
+    const hashInput = CryptoJS.SHA256(val).toString();
+
+    if (daftarKode.includes(hashInput)) {
+        tampilkanPesan("Kode benar! Sandbox aktif.", false);
+        applySandbox();
+        localStorage.setItem(STORAGE_KEY, "1");
+        setTimeout(() => { modal.style.display = "none"; }, 700);
+    } else {
+        tampilkanPesan("Kode salah! Silakan coba lagi.", true);
+        input.style.animation = "shake 0.3s";
+        setTimeout(() => input.style.animation = "", 350);
+    }
+}
+
+
+    // ==========================
+    // FUNKSI TAMPILKAN PESAN
+    // ==========================
+    function tampilkanPesan(text, error = true) {
+        msg.style.display = "block";
+        msg.style.color = error ? "#ffb3b3" : "#b3ffb3";
+        msg.textContent = text;
+    }
+
+    // ==========================
+    // FUNGSI AKTIFKAN SANDBOX
+    // ==========================
+    function applySandbox() {
+        let iframe = document.getElementById("wcq");
+        if (!iframe) iframe = document.querySelector(".player-frame");
+
+        if (!iframe) {
+            console.error("iframe player tidak ditemukan!");
+            return;
+        }
+
+        // tambahkan sandbox
+        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+
+        console.log("Sandbox diaktifkan.");
+    }
+
+});
+      // Tombol buka modal kode
+document.getElementById("kodeToggle").addEventListener("click", () => {
+    document.getElementById("kodeModal").style.display = "flex";
+});
+
+// Tombol skip tetap menutup modal
+document.getElementById("kodeSkip").addEventListener("click", () => {
+    document.getElementById("kodeModal").style.display = "none";
+});
+
+</script>
+
+    <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
+  
+</body>
+</html> 
