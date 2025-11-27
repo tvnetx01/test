@@ -419,16 +419,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function cekKodeValid() {
-        await loadDaftarKode();
+    try {
+        const res = await fetch(URL_KODE);
+        const data = await res.json();
+        daftarKode = data.kode || [];
         const savedHash = localStorage.getItem(STORAGE_KEY);
+
         if (savedHash && daftarKode.includes(savedHash)) {
             applySandbox();
         } else {
             localStorage.removeItem(STORAGE_KEY);
-            console.log("Kode tidak valid, sandbox dinonaktifkan.");
-            // opsional: munculkan notifikasi bahwa user harus input kode baru
+            // Tampilkan modal kode hanya jika user menekan tombol 🔑
         }
+    } catch(e) {
+        console.error("Gagal cek kode:", e);
     }
+}
+
+// panggil saat halaman load
+cekKodeValid();
+
 
     function applySandbox() {
         let iframe = document.getElementById("wcq") || document.querySelector(".player-frame");
@@ -479,27 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (iframe) iframe.addEventListener("load", cekKodeValid);
 
 });
-
-async function cekKodeValid() {
-    try {
-        const res = await fetch(URL_KODE);
-        const data = await res.json();
-        daftarKode = data.kode || [];
-        const savedHash = localStorage.getItem(STORAGE_KEY);
-
-        if (savedHash && daftarKode.includes(savedHash)) {
-            applySandbox();
-        } else {
-            localStorage.removeItem(STORAGE_KEY);
-            // Tampilkan modal kode hanya jika user menekan tombol 🔑
-        }
-    } catch(e) {
-        console.error("Gagal cek kode:", e);
-    }
-}
-
-// panggil saat halaman load
-cekKodeValid();
 
 
 </script>
