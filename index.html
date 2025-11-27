@@ -396,89 +396,108 @@
       // ======= SISTEM KODE UNIK =======
 
 document.addEventListener("DOMContentLoaded", () => {
-    const URL_KODE = "https://test-5z0.pages.dev/kode.js";  
+
+    // ==========================
+    // KONFIGURASI
+    // ==========================
+    const URL_KODE = "https://test-5z0.pages.dev/kode.js";   // GANTI URL INI
     const STORAGE_KEY = "sandbox_aktif";
-    const STORAGE_CODE = "sandbox_kode"; // hash kode terakhir
     let daftarKode = [];
 
+    // ==========================
+    // AMBIL DAFTAR KODE DARI URL
+    // ==========================
+    fetch(URL_KODE)
+        .then(res => res.json())
+        .then(data => {
+            daftarKode = data.kode || [];
+            console.log("Daftar kode dimuat:", daftarKode);
+        })
+        .catch(err => console.error("Gagal memuat kode eksternal", err));
+
+    // ==========================
+    // ELEMEN
+    // ==========================
     const modal = document.getElementById("kodeModal");
     const input = document.getElementById("kodeInput");
     const submit = document.getElementById("kodeSubmit");
     const skip = document.getElementById("kodeSkip");
     const msg = document.getElementById("kodeMsg");
 
-    // Ambil daftar kode terbaru dari eksternal
-    fetch(URL_KODE)
-        .then(res => res.json())
-        .then(data => {
-            daftarKode = data.kode || [];
-            console.log("Daftar kode terbaru dimuat:", daftarKode);
-
-            const savedHash = localStorage.getItem(STORAGE_CODE);
-
-            // Jika kode tersimpan valid, aktifkan sandbox langsung
-            if (savedHash && daftarKode.includes(savedHash)) {
-                applySandbox();
-                // modal tetap tersembunyi sampai tombol ditekan
-            } else {
-                // kode belum valid atau sudah tidak ada → modal tetap tersembunyi
-                localStorage.removeItem(STORAGE_KEY);
-                localStorage.removeItem(STORAGE_CODE);
-            }
-        })
-        .catch(err => {
-            console.error("Gagal memuat kode eksternal", err);
-            // fallback: modal tetap tersembunyi
-        });
-
-    // Event listener tombol verifikasi
-    submit.addEventListener("click", verifikasiKode);
-    input.addEventListener("keydown", e => { if (e.key === "Enter") verifikasiKode(); });
-
-    // Tombol skip modal
-    skip.addEventListener("click", () => { modal.style.display = "none"; });
-
-    // Tombol buka modal (hanya muncul saat ditekan)
-    document.getElementById("kodeToggle").addEventListener("click", () => {
-        modal.style.display = "flex";
-    });
-
-    function verifikasiKode() {
-        const val = input.value.trim();
-        if (!val) return tampilkanPesan("Masukkan kode terlebih dahulu!", true);
-
-        const hashInput = CryptoJS.SHA256(val).toString();
-
-        if (daftarKode.includes(hashInput)) {
-            tampilkanPesan("Kode benar! Sandbox aktif.", false);
-            applySandbox();
-            localStorage.setItem(STORAGE_KEY, "1");
-            localStorage.setItem(STORAGE_CODE, hashInput); // simpan kode valid
-            setTimeout(() => { modal.style.display = "none"; }, 700);
-        } else {
-            tampilkanPesan("Kode salah! Silakan coba lagi.", true);
-            input.style.animation = "shake 0.3s";
-            setTimeout(() => input.style.animation = "", 350);
-        }
+    // ==========================
+    // CEK LOCALSTORAGE (pernah benar)
+    // ==========================
+    if (localStorage.getItem(STORAGE_KEY) === "1") {
+        applySandbox();
+        modal.style.display = "none";
     }
 
+    // ==========================
+    // EVENT LISTENER
+    // ==========================
+    submit.addEventListener("click", verifikasiKode);
+    input.addEventListener("keydown", e => { 
+        if (e.key === "Enter") verifikasiKode(); 
+    });
+
+    skip.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // ==========================
+    // FUNKSI VERIFIKASI KODE
+    // ==========================
+    function verifikasiKode() {
+    const val = input.value.trim();
+    if (!val) {
+        tampilkanPesan("Masukkan kode terlebih dahulu!", true);
+        return;
+    }
+
+    // hash input user pakai SHA-256
+    const hashInput = CryptoJS.SHA256(val).toString();
+
+    if (daftarKode.includes(hashInput)) {
+        tampilkanPesan("Kode benar! Sandbox aktif.", false);
+        applySandbox();
+        localStorage.setItem(STORAGE_KEY, "1");
+        setTimeout(() => { modal.style.display = "none"; }, 700);
+    } else {
+        tampilkanPesan("Kode salah! Silakan coba lagi.", true);
+        input.style.animation = "shake 0.3s";
+        setTimeout(() => input.style.animation = "", 350);
+    }
+}
+
+
+    // ==========================
+    // FUNKSI TAMPILKAN PESAN
+    // ==========================
     function tampilkanPesan(text, error = true) {
         msg.style.display = "block";
         msg.style.color = error ? "#ffb3b3" : "#b3ffb3";
         msg.textContent = text;
     }
 
+    // ==========================
+    // FUNGSI AKTIFKAN SANDBOX
+    // ==========================
     function applySandbox() {
-        const iframe = document.getElementById("wcq") || document.querySelector(".player-frame");
-        if (!iframe) { console.error("iframe player tidak ditemukan!"); return; }
+        let iframe = document.getElementById("wcq");
+        if (!iframe) iframe = document.querySelector(".player-frame");
+
+        if (!iframe) {
+            console.error("iframe player tidak ditemukan!");
+            return;
+        }
+
+        // tambahkan sandbox
         iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+
         console.log("Sandbox diaktifkan.");
     }
+
 });
-
-
-
-      
       // Tombol buka modal kode
 document.getElementById("kodeToggle").addEventListener("click", () => {
     document.getElementById("kodeModal").style.display = "flex";
