@@ -454,11 +454,13 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (daftarKode.includes(val)) {
-            tampilkanPesan("Kode benar! Sandbox aktif.", false);
-
-            applySandbox();
-            localStorage.setItem(STORAGE_KEY, "1");
+         // hash input user
+        const hashInput = CryptoJS.MD5(val).toString();  // gunakan MD5 atau SHA256 sesuai JSON
+        if (daftarKode.includes(hashInput)) {
+            msg.style.display = 'block';
+            msg.style.color = '#b3ffb3';
+            msg.textContent = 'Kode benar — sandbox aktif!';
+            localStorage.setItem(STORAGE_KEY, '1');
 
             setTimeout(() => {
                 modal.style.display = "none";
