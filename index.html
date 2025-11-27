@@ -256,12 +256,32 @@
 <div id="kodeModal" class="kode-modal" style="display:flex;">
     <div class="kode-box">
         <h3 style="color:gold; margin-bottom:8px;">Masukkan Kode Akses</h3>
+
         <input type="password" id="kodeInput" placeholder="Masukkan kode..." />
+
         <button id="kodeSubmit">Verifikasi</button>
+
+        <!-- Tombol SKIP baru -->
+        <button id="kodeSkip" style="
+            margin-top:10px;
+            width:100%;
+            padding:10px;
+            background:#333;
+            color:#ccc;
+            border:1px solid #666;
+            cursor:pointer;
+            border-radius:5px;
+        ">Lewati (Tanpa Kode)</button>
+
         <p id="kodeMsg" style="color:#ffb3b3; display:none; margin-top:10px;"></p>
-        <p style="font-size:12px; color:#aaa; margin-top:8px;">Masukkan kode untuk mengaktifkan sandbox pemutar.</p>
+
+        <p style="font-size:12px; color:#aaa; margin-top:8px;">
+            Masukkan kode untuk mengaktifkan sandbox.  
+            Jika tidak punya, klik tombol *Lewati*.
+        </p>
     </div>
 </div>
+
 
 
    <!-- Tombol Popup -->
@@ -392,6 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tombol submit
     btn.addEventListener('click', handleSubmit);
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSubmit(); });
+
+   document.getElementById('kodeSkip').addEventListener('click', () => {
+    modal.style.display = 'none';
+});
 
     function showMessage(text, isError = true) {
         msg.style.display = 'block';
