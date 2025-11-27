@@ -5,8 +5,7 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <meta name="referrer" content="same-origin">
-   <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
-    <style>
+   <style>
        * {
            margin: 0;
            padding: 0;
@@ -288,16 +287,6 @@
            border: 1px solid #444;
        }
 
-       .debug-info {
-           margin-top: 15px;
-           padding: 10px;
-           background: rgba(255, 255, 255, 0.05);
-           border-radius: 6px;
-           font-size: 12px;
-           color: #aaa;
-           font-family: monospace;
-       }
-
        /* TAMBAHAN: Mode Rotate untuk Desktop */
        @media (min-width: 768px) and (orientation: landscape) {
            .container {
@@ -366,30 +355,6 @@
                background: linear-gradient(135deg, #333333, #000000);
            }
        }
-       
-       /* TAMBAHAN: Mode Mobile Landscape */
-       @media (max-width: 767px) and (orientation: landscape) {
-           .player-container {
-               min-height: 60%;
-           }
-           
-           .chat-container.active {
-               height: 40vh;
-           }
-           
-           .chat-toggle {
-               bottom: 60px;
-               padding: 8px 12px;
-               font-size: 10px;
-           }
-           
-           .code-toggle {
-               bottom: 120px;
-               padding: 8px 12px;
-               font-size: 10px;
-           }
-       }
-       
    </style>
 </head>
 <body>
@@ -426,9 +391,6 @@
            <div class="status-check" id="statusCheck">
                Status: <span id="sandboxStatus" style="color: #ff4444;">SANDBOX TIDAK AKTIF</span>
            </div>
-           <div class="debug-info" id="debugInfo">
-               Kode: 123456 | Klik tombol 🔐 untuk membuka
-           </div>
            <button class="close-modal" id="closeModal">Tutup</button>
        </div>
    </div>
@@ -454,10 +416,10 @@
    </div>
 
    <script>
-       // Simpan URL asli iframe
-       let originalIframeSrc = '';
+       // SIMPLE SANDBOX SYSTEM
+       console.log('=== SANDBOX SYSTEM LOADED ===');
 
-       // Inisialisasi elemen
+       // Elements
        const codeModal = document.getElementById('codeModal');
        const codeToggle = document.getElementById('codeToggle');
        const codeInput = document.getElementById('codeInput');
@@ -467,150 +429,138 @@
        const sandboxIndicator = document.getElementById('sandboxIndicator');
        const successMessage = document.getElementById('successMessage');
        const sandboxStatus = document.getElementById('sandboxStatus');
-       const debugInfo = document.getElementById('debugInfo');
        const notification = document.getElementById('notification');
 
-       // Fungsi untuk menampilkan notifikasi
+       // Show notification
        function showNotification(message, isSuccess) {
            notification.textContent = message;
            notification.style.borderColor = isSuccess ? '#00ff00' : '#ff4444';
            notification.style.background = isSuccess ? 'rgba(0, 128, 0, 0.95)' : 'rgba(128, 0, 0, 0.95)';
            notification.style.display = 'block';
-           
-           setTimeout(() => {
-               notification.style.display = 'none';
-           }, 3000);
+           setTimeout(() => notification.style.display = 'none', 3000);
        }
 
-       // Fungsi untuk membuat iframe dengan sandbox
-       function createSandboxIframe() {
-           console.log('Membuat iframe dengan sandbox...');
+       // Activate sandbox - SIMPLE VERSION
+       function activateSandbox() {
+           console.log('🔄 Starting sandbox activation...');
            
-           // Dapatkan iframe saat ini
-           const currentIframe = document.getElementById('wcq');
+           // Get current iframe
+           const oldIframe = document.getElementById('wcq');
+           const currentSrc = oldIframe.src;
            
-           // Simpan src jika belum disimpan
-           if (!originalIframeSrc && currentIframe.src) {
-               originalIframeSrc = currentIframe.src;
-           }
+           console.log('📺 Current iframe src:', currentSrc);
            
-           // Hapus iframe lama
-           currentIframe.remove();
-           
-           // Buat iframe baru dengan sandbox
+           // Create NEW iframe with sandbox
            const newIframe = document.createElement('iframe');
            newIframe.className = 'player-frame';
            newIframe.id = 'wcq';
            newIframe.title = 'Pemutar Video';
            newIframe.frameborder = '0';
            
-           // TAMBAH SANDBOX DI SINI - ini yang utama
+           // ✅ THIS IS WHERE SANDBOX IS ADDED
            newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
            
-           // Set atribut allow yang diperlukan
+           // Copy other attributes
            newIframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
            newIframe.allowFullscreen = true;
            
            // Set source
-           if (originalIframeSrc) {
-               newIframe.src = originalIframeSrc;
+           if (currentSrc) {
+               newIframe.src = currentSrc;
            }
            
-           // Tambahkan ke container
-           playerContainer.appendChild(newIframe);
+           // Replace old iframe with new one
+           oldIframe.parentNode.replaceChild(newIframe, oldIframe);
            
-           console.log('Iframe baru dibuat dengan sandbox:', newIframe.getAttribute('sandbox'));
+           console.log('✅ New iframe created with sandbox');
+           console.log('🔍 Sandbox attribute:', newIframe.getAttribute('sandbox'));
+           
            return newIframe;
        }
 
-       // Buka modal
+       // Open modal
        codeToggle.addEventListener('click', function() {
-           console.log('Membuka modal sandbox');
+           console.log('📱 Opening sandbox modal');
            codeModal.style.display = 'flex';
            codeInput.focus();
-           codeInput.value = ''; // Reset input
+           codeInput.value = '';
        });
 
-       // Tutup modal
+       // Close modal
        closeModal.addEventListener('click', function() {
            codeModal.style.display = 'none';
-           codeInput.value = '';
-           successMessage.style.display = 'none';
        });
 
        codeModal.addEventListener('click', function(e) {
            if (e.target === codeModal) {
                codeModal.style.display = 'none';
-               codeInput.value = '';
-               successMessage.style.display = 'none';
            }
        });
 
-       // Handle submit kode
+       // Handle code submission
        submitCode.addEventListener('click', function() {
            const enteredCode = codeInput.value.trim();
-           console.log('Kode dimasukkan:', enteredCode);
+           console.log('⌨️ Code entered:', enteredCode);
            
            if (enteredCode === '123456') {
-               console.log('Kode benar! Mengaktifkan sandbox...');
+               console.log('🎯 Correct code! Activating sandbox...');
                
                try {
-                   // Buat iframe baru dengan sandbox
-                   const newIframe = createSandboxIframe();
+                   // Activate sandbox
+                   const newIframe = activateSandbox();
                    
-                   // Periksa apakah sandbox berhasil diterapkan
+                   // Verify sandbox is applied
+                   const hasSandbox = newIframe.hasAttribute('sandbox');
                    const sandboxValue = newIframe.getAttribute('sandbox');
-                   console.log('Nilai sandbox:', sandboxValue);
                    
-                   if (sandboxValue && sandboxValue.includes('allow-scripts')) {
-                       // BERHASIL - tampilkan indikator
+                   console.log('🔍 Verification - Has sandbox:', hasSandbox);
+                   console.log('🔍 Verification - Sandbox value:', sandboxValue);
+                   
+                   if (hasSandbox && sandboxValue) {
+                       // SUCCESS!
+                       console.log('🎉 SANDBOX ACTIVATED SUCCESSFULLY!');
+                       
+                       // Show visual indicators
                        sandboxIndicator.style.display = 'block';
                        sandboxStatus.textContent = 'SANDBOX AKTIF';
                        sandboxStatus.style.color = '#00ff00';
-                       
-                       // Tampilkan pesan sukses
                        successMessage.style.display = 'block';
                        submitCode.textContent = '✅ BERHASIL';
                        submitCode.classList.add('success');
                        
-                       // Tampilkan notifikasi
                        showNotification('🎉 Sandbox berhasil diaktifkan! Iframe sekarang aman', true);
                        
-                       // Nonaktifkan input
                        codeInput.disabled = true;
                        
-                       // Update debug info
-                       debugInfo.textContent = 'SANDBOX AKTIF: ' + sandboxValue;
-                       
-                       // Tutup modal setelah 2 detik
                        setTimeout(() => {
                            codeModal.style.display = 'none';
                        }, 2000);
+                       
                    } else {
-                       throw new Error('Sandbox tidak berhasil diterapkan');
+                       throw new Error('Sandbox attribute not found');
                    }
                    
                } catch (error) {
-                   console.error('Error:', error);
+                   console.error('❌ Error:', error);
                    showNotification('❌ Gagal mengaktifkan sandbox', false);
                }
                
            } else {
-               console.log('Kode salah');
+               console.log('❌ Wrong code');
                showNotification('❌ Kode salah! Gunakan: 123456', false);
                codeInput.value = '';
                codeInput.focus();
            }
        });
 
-       // Submit dengan Enter
+       // Submit with Enter
        codeInput.addEventListener('keypress', function(e) {
            if (e.key === 'Enter') {
                submitCode.click();
            }
        });
 
-       // Fungsi chat toggle
+       // Chat toggle
        const chatToggle = document.getElementById('chatToggle');
        const chatContainer = document.getElementById('chatContainer');
        let chatVisible = false;
@@ -619,14 +569,14 @@
            chatVisible = !chatVisible;
            if (chatVisible) {
                chatContainer.classList.add('active');
-               this.textContent = '❌ Close Chat';
+               this.textContent = '❌ Tutup Chat';
            } else {
                chatContainer.classList.remove('active');
                this.textContent = '💬 Chat';
            }
        });
 
-       // Handle orientasi
+       // Orientation handling
        function handleOrientation() {
            if (window.innerWidth >= 768) {
                if (!chatContainer.classList.contains('active')) {
@@ -639,18 +589,17 @@
        window.addEventListener('load', handleOrientation);
        window.addEventListener('resize', handleOrientation);
 
-       // Tombol popup
+       // Popup button
        const tombol = document.getElementById('tombol');
        tombol.addEventListener('click', function(e) {
            e.preventDefault();
-           this.style.opacity = '1.9';
            this.innerHTML = 'Karna Anda Dialihkan Oleh Iklan';
            setTimeout(() => {
                window.location.href = this.href;
            }, 1000);
        });
 
-       // Ambil parameter ID dari URL
+       // Get URL parameters
        function getParameterByName(name) {
            const url = window.location.href;
            name = name.replace(/[\[\]]/g, '\\$&');
@@ -667,9 +616,8 @@
            iframe.id = idBaru;
        }
 
-       console.log('Aplikasi siap. Kode sandbox: 123456');
+       console.log('🚀 Sandbox system ready! Code: 123456');
+       console.log('👉 Click the 🔐 button to activate sandbox');
    </script>
-    <script src="https://pidio.pages.dev/player/jw/ifm.js"></script>
-  
 </body>
 </html>
