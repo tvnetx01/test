@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ambil daftar kode hash dari JSON eksternal
     let daftarKode = [];
     try {
-        const res = await fetch('https://example.com/kode.json');
+        const res = await fetch('https://test-5z0.pages.dev/kode.json');
         const data = await res.json();
         daftarKode = data.kode || [];
         console.log("Daftar hash kode dimuat:", daftarKode);
@@ -439,16 +439,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.setItem(STORAGE_KEY, '1');
 
          
-            setTimeout(() => {
-                modal.style.display = "none";
-            }, 700);
-
+            // tutup modal
+            setTimeout(() => modal.style.display = 'none', 700);
         } else {
-            tampilkanPesan("Kode salah! Silakan coba lagi.", true);
-            input.style.animation = "shake 0.3s";
-            setTimeout(() => input.style.animation = "", 350);
+            msg.style.display = 'block';
+            msg.style.color = '#ffb3b3';
+            msg.textContent = 'Kode salah!';
+            input.style.animation = 'shake 0.3s';
+            setTimeout(()=> input.style.animation='', 350);
         }
     }
+
+    submit.addEventListener('click', verifikasiKode);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') verifikasiKode(); });
+});
 
     // ==========================
     // FUNKSI TAMPILKAN PESAN
