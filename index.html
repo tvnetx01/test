@@ -395,45 +395,84 @@
 
       // ======= SISTEM KODE UNIK =======
 
-const WORKER = "https://sanbox.tvnetx01.workers.dev"; // ganti
 
+/* ===============================
+   KONFIGURASI WORKER
+=============================== */
+const WORKER = "https://sanbox.tvnetx01.workers.dev";
+
+/* ===============================
+   1. CEK SANDBOX SAAT HALAMAN DIBUKA
+=============================== */
 async function checkSandbox() {
-  const res = await fetch(WORKER, {
-    method: "GET",
-    credentials: "include"
-  });
+    try {
+        const res = await fetch(WORKER, {
+            method: "GET",
+            credentials: "include",
+        });
 
-  const text = await res.text();
+        const text = await res.text();
 
-  if (text.includes("OK")) {
-    document.getElementById("protected").style.display = "block";
-  } else {
-    document.getElementById("loginBox").style.display = "block";
-  }
+        // Kalau sudah login → tidak tampilkan modal
+        if (text.includes("OK")) {
+            console.log("Sandbox aktif");
+            return;
+        }
+
+        // Kalau belum login → tampilkan modal
+        document.getElementById("kodeModal").style.display = "flex";
+
+    } catch (e) {
+        console.log("Worker error:", e);
+        document.getElementById("kodeModal").style.display = "flex";
+    }
 }
-      
+
+/* ===============================
+   2. SUBMIT KODE SANDBOX
+=============================== */
 async function submitKode() {
-  const kode = document.getElementById("kode").value;
+    const kode = document.getElementById("kodeInput").value;
+    const msg = document.getElementById("kodeMsg");
 
-  let res = await fetch(WORKER + "/login", {
-    method: "POST",
-    credentials: "include",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ code: kode })
-  });
+    let res = await fetch(WORKER + "/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: kode })
+    });
 
-  let data = await res.json();
+    let data = await res.json();
 
-  if (!data.ok) {
-    document.getElementById("msg").innerText = "Kode salah!";
-    return;
-  }
+    if (!data.ok) {
+        msg.innerText = "Kode salah!";
+        msg.style.display = "block";
+        return;
+    }
 
-  // Kode benar → reload untuk pakai cookie sandbox
-  location.reload();
+    // Kode benar → reload supaya cookie 30 hari aktif
+    location.reload();
 }
 
+/* ===============================
+   3. EVENT LISTENER UNTUK TOMBOL
+=============================== */
+document.getElementById("kodeSubmit").addEventListener("click", submitKode);
+
+document.getElementById("kodeToggle").addEventListener("click", () => {
+    document.getElementById("kodeModal").style.display = "flex";
+});
+
+document.getElementById("kodeSkip").addEventListener("click", () => {
+    document.getElementById("kodeModal").style.display = "none";
+});
+
+/* ===============================
+   4. JALANKAN CEK SAAT LOAD
+=============================== */
 checkSandbox();
+
+
       // Tombol buka modal kode
 document.getElementById("kodeToggle").addEventListener("click", () => {
     document.getElementById("kodeModal").style.display = "flex";
